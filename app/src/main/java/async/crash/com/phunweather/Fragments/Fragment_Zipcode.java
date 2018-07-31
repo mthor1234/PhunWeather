@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import async.crash.com.phunweather.Adapters.MyItemRecyclerViewAdapter;
+import async.crash.com.phunweather.Adapters.Adapater_MyItemRecyclerView;
 import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.dummy.DummyContent;
 import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
@@ -21,7 +21,7 @@ import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ItemFragment extends Fragment {
+public class Fragment_Zipcode extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -33,13 +33,13 @@ public class ItemFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ItemFragment() {
+    public Fragment_Zipcode() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ItemFragment newInstance(int columnCount) {
-        ItemFragment fragment = new ItemFragment();
+    public static Fragment_Zipcode newInstance(int columnCount) {
+        Fragment_Zipcode fragment = new Fragment_Zipcode();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -69,7 +69,7 @@ public class ItemFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new Adapater_MyItemRecyclerView(DummyContent.ITEMS, mListener));
         }
         return view;
     }

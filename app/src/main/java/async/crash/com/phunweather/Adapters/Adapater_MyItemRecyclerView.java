@@ -8,21 +8,21 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import async.crash.com.phunweather.Fragments.ItemFragment;
+import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
 import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link ItemFragment.OnListFragmentInteractionListener}.
+ * specified {@link Fragment_Zipcode.OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
+public class Adapater_MyItemRecyclerView extends RecyclerView.Adapter<Adapater_MyItemRecyclerView.ViewHolder> {
 
     private final List<DummyItem> mValues;
-    private final ItemFragment.OnListFragmentInteractionListener mListener;
+    private final Fragment_Zipcode.OnListFragmentInteractionListener mListener;
 
-    public MyItemRecyclerViewAdapter(List<DummyItem> items, ItemFragment.OnListFragmentInteractionListener listener) {
+    public Adapater_MyItemRecyclerView(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

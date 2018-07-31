@@ -9,6 +9,6 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="async.crash.com.phunweather.Fragments.ItemFragment"
+    tools:context="async.crash.com.phunweather.Fragments.Fragment_Zipcode"
     tools:listitem="@layout/fragment_item" />
 

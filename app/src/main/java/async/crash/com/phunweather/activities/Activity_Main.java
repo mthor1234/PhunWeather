@@ -9,14 +9,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import async.crash.com.phunweather.Fragments.ItemFragment;
+import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
 import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.dummy.DummyContent;
 
-public class MainActivity extends AppCompatActivity
-        implements ItemFragment.OnListFragmentInteractionListener{
+public class Activity_Main extends AppCompatActivity
+        implements Fragment_Zipcode.OnListFragmentInteractionListener{
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "Activity_Main";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity
 //        });
 
 
-        // Create ItemFragment and add it
-        Fragment fragment = ItemFragment.newInstance(1);
+        // Create Fragment_Zipcode and add it
+        Fragment fragment = Fragment_Zipcode.newInstance(1);
 
         FragmentManager fm = getSupportFragmentManager();
 
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    // Implements from ItemFragment
+    // Implements from Fragment_Zipcode
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
         Log.v(TAG, "onListFragmentInteraction");
