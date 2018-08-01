@@ -1,4 +1,4 @@
-package async.crash.com.phunweather.dummy;
+package async.crash.com.phunweather.Models;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,13 +23,18 @@ public class DummyContent {
      */
     public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
-    private static final int COUNT = 25;
+    private static final int COUNT = 3;
 
     static {
         // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem(i));
-        }
+//        for (int i = 1; i <= COUNT; i++) {
+//            addItem(createDummyItem(i));
+//        }
+
+        // Dummy code to prepopulate the list with three entries
+        addItem(new DummyItem(String.valueOf(0), "92107", makeDetails(0)));
+        addItem(new DummyItem(String.valueOf(1), "92109", makeDetails(1)));
+        addItem(new DummyItem(String.valueOf(2), "06084", makeDetails(2)));
     }
 
     private static void addItem(DummyItem item) {

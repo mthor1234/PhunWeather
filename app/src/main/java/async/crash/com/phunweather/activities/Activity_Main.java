@@ -11,7 +11,7 @@ import android.view.MenuItem;
 
 import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.dummy.DummyContent;
+import async.crash.com.phunweather.Models.DummyContent;
 
 public class Activity_Main extends AppCompatActivity
         implements Fragment_Zipcode.OnListFragmentInteractionListener{

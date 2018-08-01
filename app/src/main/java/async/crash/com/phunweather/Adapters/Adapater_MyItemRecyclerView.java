@@ -10,7 +10,7 @@ import java.util.List;
 
 import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
+import async.crash.com.phunweather.Models.DummyContent.DummyItem;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the

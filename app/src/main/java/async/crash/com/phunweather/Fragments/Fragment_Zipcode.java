@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 
 import async.crash.com.phunweather.Adapters.Adapater_MyItemRecyclerView;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.dummy.DummyContent;
-import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
+import async.crash.com.phunweather.Models.DummyContent;
+import async.crash.com.phunweather.Models.DummyContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
