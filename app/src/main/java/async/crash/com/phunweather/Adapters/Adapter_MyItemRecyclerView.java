@@ -17,12 +17,12 @@ import async.crash.com.phunweather.Models.DummyContent.DummyItem;
  * specified {@link Fragment_Zipcode.OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class Adapater_MyItemRecyclerView extends RecyclerView.Adapter<Adapater_MyItemRecyclerView.ViewHolder> {
+public class Adapter_MyItemRecyclerView extends RecyclerView.Adapter<Adapter_MyItemRecyclerView.ViewHolder> {
 
     private final List<DummyItem> mValues;
     private final Fragment_Zipcode.OnListFragmentInteractionListener mListener;
 
-    public Adapater_MyItemRecyclerView(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
+    public Adapter_MyItemRecyclerView(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

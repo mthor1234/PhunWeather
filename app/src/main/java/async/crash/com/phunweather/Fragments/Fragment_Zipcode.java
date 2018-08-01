@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import async.crash.com.phunweather.Adapters.Adapater_MyItemRecyclerView;
+import async.crash.com.phunweather.Adapters.Adapter_MyItemRecyclerView;
 import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.Models.DummyContent;
 import async.crash.com.phunweather.Models.DummyContent.DummyItem;
@@ -69,7 +69,7 @@ public class Fragment_Zipcode extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new Adapater_MyItemRecyclerView(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new Adapter_MyItemRecyclerView(DummyContent.ITEMS, mListener));
         }
         return view;
     }
