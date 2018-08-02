@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_marginTop="5dp"
+    android:padding="8dp"
+    android:background="#fff">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="130dp">
+
+        <TextView
+            android:id="@+id/tv_dayofweek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:textSize="20dp" />
+
+        <TextView
+            android:id="@+id/tv_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Aug 1st, 2018"
+            android:textSize="20dp"
+            android:layout_toRightOf="@id/tv_dayofweek"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/tv_daytemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Day 78F"
+            android:textSize="20dp"
+            android:layout_below="@id/tv_dayofweek" />
+
+        <TextView
+            android:id="@+id/tv_nighttemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Night 71F"
+            android:textSize="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/tv_daytemp"
+            android:layout_alignTop="@id/tv_daytemp"/>
+
+        <TextView
+            android:id="@+id/tv_currenttemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="77F"
+            android:textSize="55dp"
+            android:textStyle="bold"
+            android:layout_below="@id/tv_daytemp"
+            android:layout_marginLeft="10dp"
+            android:layout_alignLeft="@id/tv_daytemp"
+            android:layout_alignRight="@id/tv_nighttemp"
+            android:textAlignment="center"/>
+
+
+    </RelativeLayout>
+
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@drawable/sun_64"
+        android:id="@+id/forecast_iv_thumbnail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="15dp"/>
+
+    <TextView
+        android:id="@+id/tv_weather_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sunny"
+        android:textSize="25dp"
+        app:layout_constraintLeft_toRightOf="@id/forecast_iv_thumbnail"
+        app:layout_constraintRight_toLeftOf="@id/forecast_iv_thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/forecast_iv_thumbnail"/>
+    
+
+
+</android.support.constraint.ConstraintLayout>
