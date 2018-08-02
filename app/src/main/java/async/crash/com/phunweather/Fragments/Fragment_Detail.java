@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import async.crash.com.phunweather.R;
 
@@ -23,7 +22,7 @@ import async.crash.com.phunweather.R;
 public class Fragment_Detail extends Fragment {
 
     //Define the TAG so it is refactorable
-    // With Proguard on, it should have a big impact on logcat
+    // With Proguard on, it should not have a big impact on logcat
     private static final String TAG = Fragment_Detail.class.getSimpleName();
 
     // TODO: Rename parameter arguments, choose names that match
@@ -34,8 +33,6 @@ public class Fragment_Detail extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-    private TextView tv_address;
 
     private OnFragmentInteractionListener mListener;
 
@@ -76,11 +73,9 @@ public class Fragment_Detail extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        tv_address = (TextView) view.findViewById(R.id.detail_tv_address);
 
         Log.d(TAG, "Param2 is: " + mParam2);
 
-        tv_address.setText(mParam2);
         // Inflate the layout for this fragment
         return view;
     }

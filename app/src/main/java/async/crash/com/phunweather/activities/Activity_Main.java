@@ -1,6 +1,5 @@
 package async.crash.com.phunweather.activities;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -10,14 +9,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import async.crash.com.phunweather.Fragments.Fragment_Detail;
+import async.crash.com.phunweather.Fragments.DetailFragment;
 import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
-import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.Models.DummyContent;
+import async.crash.com.phunweather.R;
 
 public class Activity_Main extends AppCompatActivity
         implements Fragment_Zipcode.OnListFragmentInteractionListener,
-                    Fragment_Detail.OnFragmentInteractionListener{
+                    DetailFragment.OnFragmentInteractionListener{
 
     private static final String TAG = "Activity_Main";
 
@@ -83,7 +82,8 @@ public class Activity_Main extends AppCompatActivity
 
         FragmentManager fm = getSupportFragmentManager();
 
-        Fragment detailFragment = Fragment_Detail.newInstance(item.id, item.content);
+        Fragment detailFragment = DetailFragment.newInstance(item.id, item.content);
+//        Fragment detailFragment = Fragment_Detail.newInstance(item.id, item.content);
 
         fm.beginTransaction()
                 .replace(R.id.fragment_container, detailFragment)
@@ -94,7 +94,7 @@ public class Activity_Main extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-        // Used to communicate with Fragment_Detail
+    public void onListFragmentInteraction(async.crash.com.phunweather.dummy.DummyContent.DummyItem item) {
+
     }
 }
