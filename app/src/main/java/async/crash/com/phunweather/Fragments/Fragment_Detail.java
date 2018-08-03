@@ -1,7 +1,6 @@
 package async.crash.com.phunweather.Fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -9,6 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
 
 /**
@@ -36,6 +39,8 @@ public class Fragment_Detail extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
+    private ArrayList<Model_Forecast> models;
+
     public Fragment_Detail() {
         // Required empty public constructor
     }
@@ -49,7 +54,7 @@ public class Fragment_Detail extends Fragment {
      * @return A new instance of fragment Fragment_Detail.
      */
     // TODO: Rename and change types and number of parameters
-    public static Fragment_Detail newInstance(String param1, String param2) {
+    public static Fragment_Detail newInstance(String param1, String param2, List<Model_Forecast> model) {
         Fragment_Detail fragment = new Fragment_Detail();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -81,11 +86,11 @@ public class Fragment_Detail extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+//    public void onButtonPressed(Uri uri) {
+//        if (mListener != null) {
+//            mListener.onFragmentInteraction(uri);
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {
@@ -116,6 +121,7 @@ public class Fragment_Detail extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
+
     }
 }

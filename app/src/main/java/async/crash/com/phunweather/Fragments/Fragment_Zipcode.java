@@ -11,9 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import async.crash.com.phunweather.Adapters.Adapter_MyItemRecyclerView;
-import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.Models.DummyContent;
-import async.crash.com.phunweather.Models.DummyContent.DummyItem;
+import async.crash.com.phunweather.R;
 
 /**
  * A fragment representing a list of Items.
@@ -104,6 +103,12 @@ public class Fragment_Zipcode extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(DummyContent.DummyItem item);
     }
+
+//    public interface OnListFragmentInteractionListener {
+//        // TODO: Update argument type and name
+//        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
+//    }
+
 }

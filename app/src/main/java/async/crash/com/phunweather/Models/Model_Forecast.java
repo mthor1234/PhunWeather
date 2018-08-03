@@ -38,11 +38,19 @@ import android.graphics.Bitmap;
 
 public class Model_Forecast {
 
-    private int minTemp, maxTemp, humidity, windSpeed;
+    private double minTemp, maxTemp, humidity, windSpeed;
     private String description;
     private Bitmap weatherIcon;
 
-    public Model_Forecast(int minTemp, int maxTemp, int humidity, int windSpeed, String description, Bitmap weatherIcon) {
+    public Model_Forecast(double minTemp, double maxTemp, double humidity, double windSpeed, String description) {
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.humidity = humidity;
+        this.windSpeed = windSpeed;
+        this.description = description;
+    }
+
+    public Model_Forecast(double minTemp, double maxTemp, double humidity, double windSpeed, String description, Bitmap weatherIcon) {
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
         this.humidity = humidity;
@@ -51,35 +59,38 @@ public class Model_Forecast {
         this.weatherIcon = weatherIcon;
     }
 
-    public int getMinTemp() {
+    public Model_Forecast() {
+    }
+
+    public double getMinTemp() {
         return minTemp;
     }
 
-    public void setMinTemp(int minTemp) {
+    public void setMinTemp(double minTemp) {
         this.minTemp = minTemp;
     }
 
-    public int getMaxTemp() {
+    public double getMaxTemp() {
         return maxTemp;
     }
 
-    public void setMaxTemp(int maxTemp) {
+    public void setMaxTemp(double maxTemp) {
         this.maxTemp = maxTemp;
     }
 
-    public int getHumidity() {
+    public double getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(int humidity) {
+    public void setHumidity(double humidity) {
         this.humidity = humidity;
     }
 
-    public int getWindSpeed() {
+    public double getWindSpeed() {
         return windSpeed;
     }
 
-    public void setWindSpeed(int windSpeed) {
+    public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
 

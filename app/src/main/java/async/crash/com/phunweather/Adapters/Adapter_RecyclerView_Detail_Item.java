@@ -9,6 +9,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import async.crash.com.phunweather.Fragments.DetailFragment.OnFragmentInteractionListener;
+import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
 import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
 
@@ -19,10 +20,14 @@ import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
  */
 public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapter_RecyclerView_Detail_Item.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+//    private final List<DummyItem> mValues;
+    private final List<Model_Forecast> mValues;
     private final OnFragmentInteractionListener mListener;
 
-    public Adapter_RecyclerView_Detail_Item(List<DummyItem> items, OnFragmentInteractionListener listener) {
+    private TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date;
+
+//    public Adapter_RecyclerView_Detail_Item(List<DummyItem> items, OnFragmentInteractionListener listener) {
+    public Adapter_RecyclerView_Detail_Item(List<Model_Forecast> items, OnFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -31,6 +36,13 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.forecast_row_item, parent, false);
+
+        tv_dayTemp =  (TextView) view.findViewById(R.id.tv_daytemp);
+        tv_nightTemp =  (TextView) view.findViewById(R.id.tv_nighttemp);
+        tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
+        tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
+        tv_date =  (TextView) view.findViewById(R.id.tv_date);
+
         return new ViewHolder(view);
     }
 
@@ -40,13 +52,18 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 //        holder.mIdView.setText(mValues.get(position).id);
 //        holder.mContentView.setText(mValues.get(position).content);
 
+        holder.tv_dayOfWeek.setText("Today");
+        holder.tv_dayTemp.setText(Double.toString(mValues.get(position).getMaxTemp()));
+        holder.tv_nightTemp.setText(Double.toString(mValues.get(position).getMinTemp()));
+        holder.tv_currentTemp.setText("77F");
+
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+//                    mListener.onListFragmentInteraction(holder.mItem);
                 }
             }
         });
@@ -58,21 +75,38 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+//        public final View mView;
+//        public final TextView mIdView;
+//        public final TextView mContentView;
+////        public DummyItem mItem;
+//        public Model_Forecast mItem;
+//
+//        public ViewHolder(View view) {
+//            super(view);
+//            mView = view;
+//            mIdView = (TextView) view.findViewById(R.id.id);
+//            mContentView = (TextView) view.findViewById(R.id.content);
+//        }
+
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date;
+//        public DummyItem mItem;
+        public Model_Forecast mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            tv_dayTemp =  (TextView) view.findViewById(R.id.tv_daytemp);
+            tv_nightTemp =  (TextView) view.findViewById(R.id.tv_nighttemp);
+            tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
+            tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
+            tv_date =  (TextView) view.findViewById(R.id.tv_date);
+
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + tv_dayOfWeek.getText() + "'";
         }
     }
 }

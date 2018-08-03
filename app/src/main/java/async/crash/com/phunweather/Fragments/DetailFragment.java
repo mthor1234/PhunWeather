@@ -9,12 +9,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import java.util.ArrayList;
 
 import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Detail_Item;
+import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.dummy.DummyContent;
-import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -43,8 +43,7 @@ public class DetailFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private TextView tv_address;
-
+    private static ArrayList<Model_Forecast> weather_forecast;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,11 +62,16 @@ public class DetailFragment extends Fragment {
         return fragment;
     }
 
-    public static DetailFragment newInstance(String param1, String param2) {
+//    public static DetailFragment newInstance(String param1, String param2, ArrayList<Model_Forecast> forecast) {
+    public static DetailFragment newInstance(ArrayList<Model_Forecast> forecast) {
         DetailFragment fragment = new DetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+
+        weather_forecast = forecast;
+
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,7 +99,8 @@ public class DetailFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(DummyContent.ITEMS, mListener));
+//            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(Model_Forecast.ITEMS, mListener));
+            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
         }
         return view;
     }
@@ -128,8 +133,11 @@ public class DetailFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnDetailFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
+    }
+
+    public interface OnFragmentInteractionListener {
     }
 }

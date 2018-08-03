@@ -16,6 +16,9 @@ public class Model_Address {
         this.state = state;
     }
 
+    public Model_Address() {
+    }
+
     public String getZipcode() {
         return zipcode;
     }
