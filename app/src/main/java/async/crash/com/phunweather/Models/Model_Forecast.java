@@ -50,12 +50,12 @@ package async.crash.com.phunweather.Models;
 
 public class Model_Forecast {
 
-    private double currentTemp, minTemp, maxTemp, humidity, windSpeed;
+    private int currentTemp, minTemp, maxTemp, humidity, windSpeed;
     private String description, date;
 //    private Drawable weatherIcon;
     private int drawableID;
 
-    public Model_Forecast(double currentTemp, double minTemp, double maxTemp, double humidity, double windSpeed, String description, String date, int drawableID) {
+    public Model_Forecast(int currentTemp, int minTemp, int maxTemp, int humidity, int windSpeed, String description, String date, int drawableID) {
         this.currentTemp = currentTemp;
         this.minTemp = minTemp;
         this.maxTemp = maxTemp;
@@ -66,56 +66,46 @@ public class Model_Forecast {
         this.drawableID = drawableID;
     }
 
-//    public Model_Forecast(double minTemp, double maxTemp, double humidity, double windSpeed, String description, Bitmap weatherIcon) {
-//        this.currentTemp = currentTemp;
-//        this.minTemp = minTemp;
-//        this.maxTemp = maxTemp;
-//        this.humidity = humidity;
-//        this.windSpeed = windSpeed;
-//        this.description = description;
-//        this.weatherIcon = weatherIcon;
-//    }
-
     public Model_Forecast() {
     }
 
-    public double getCurrentTemp() {
+    public int getCurrentTemp() {
         return currentTemp;
     }
 
-    public void setCurrentTemp(double currentTemp) {
+    public void setCurrentTemp(int currentTemp) {
         this.currentTemp = currentTemp;
     }
 
-    public double getMinTemp() {
+    public int getMinTemp() {
         return minTemp;
     }
 
-    public void setMinTemp(double minTemp) {
+    public void setMinTemp(int minTemp) {
         this.minTemp = minTemp;
     }
 
-    public double getMaxTemp() {
+    public int getMaxTemp() {
         return maxTemp;
     }
 
-    public void setMaxTemp(double maxTemp) {
+    public void setMaxTemp(int maxTemp) {
         this.maxTemp = maxTemp;
     }
 
-    public double getHumidity() {
+    public int getHumidity() {
         return humidity;
     }
 
-    public void setHumidity(double humidity) {
+    public void setHumidity(int humidity) {
         this.humidity = humidity;
     }
 
-    public double getWindSpeed() {
+    public int getWindSpeed() {
         return windSpeed;
     }
 
-    public void setWindSpeed(double windSpeed) {
+    public void setWindSpeed(int windSpeed) {
         this.windSpeed = windSpeed;
     }
 

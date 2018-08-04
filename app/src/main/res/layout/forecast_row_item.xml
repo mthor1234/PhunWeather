@@ -13,12 +13,12 @@
         android:layout_width="match_parent"
         android:layout_height="130dp">
 
-        <TextView
-            android:id="@+id/tv_dayofweek"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Today"
-            android:textSize="20dp" />
+        <!--<TextView-->
+            <!--android:id="@+id/tv_dayofweek"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Today"-->
+            <!--android:textSize="20dp" />-->
 
         <TextView
             android:id="@+id/tv_date"
@@ -26,8 +26,7 @@
             android:layout_height="wrap_content"
             android:text="Aug 1st, 2018"
             android:textSize="20dp"
-            android:layout_toRightOf="@id/tv_dayofweek"
-            android:layout_marginLeft="10dp"/>
+            android:layout_alignParentLeft="true" />
 
         <TextView
             android:id="@+id/tv_daytemp"
@@ -35,7 +34,7 @@
             android:layout_height="wrap_content"
             android:text="Day 78F"
             android:textSize="20dp"
-            android:layout_below="@id/tv_dayofweek" />
+            android:layout_below="@id/tv_date" />
 
         <TextView
             android:id="@+id/tv_nighttemp"
