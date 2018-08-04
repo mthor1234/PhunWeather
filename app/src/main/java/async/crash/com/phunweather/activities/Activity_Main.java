@@ -41,9 +41,8 @@ public class Activity_Main extends AppCompatActivity
     private static final String OPENWEATHERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
 
 //    private static final String BASE_OPENWEATHERMAP_URL2 = "https://api.openweathermap.org/data/2.5/forecast?id=524901&APPID="+OPENWEATHERMAP_API_KEY+"";
-    private static final String BASE_OPENWEATHERMAP_URL2 = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=ae1d2194a7816e11b58f5e4fcc19f195";
+    private static final String BASE_OPENWEATHERMAP_URL2 = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial";
 
-//            "api.openweathermap.org/data/2.5/forecast/daily?zip={";
 
     // Volley
     private JsonArrayRequest request;
@@ -57,9 +56,6 @@ public class Activity_Main extends AppCompatActivity
     private ProgressDialog pDialog;
 
 
-
-
-    //{zip code},{country code}\n";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +74,7 @@ public class Activity_Main extends AppCompatActivity
 //        pDialog.show();
 
 
+        // Get JSON
         objectRequest();
 
 
@@ -101,10 +98,6 @@ public class Activity_Main extends AppCompatActivity
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
-
-
-
-
 
     }
 
@@ -137,14 +130,11 @@ public class Activity_Main extends AppCompatActivity
 //    public void onListFragmentInteraction(ArrayList<Model_Forecast> item) {
         Log.v(TAG, "onListFragmentInteraction");
 
-//        jsonRequest();
-//        sendAndRequestResponse();
-
         Bundle bundle = new Bundle();
 
         FragmentManager fm = getSupportFragmentManager();
 
-        generateDummyData();
+//        generateDummyData();
 
 //        Fragment detailFragment = DetailFragment.newInstance(item.get, item.content, models);
         Fragment detailFragment = DetailFragment.newInstance(models);
@@ -158,144 +148,11 @@ public class Activity_Main extends AppCompatActivity
 
     }
 
-
-    private void jsonRequest(){
-
-        System.out.println("Starting Response");
-//
-//        System.out.println("API Call " + BASE_OPENWEATHERMAP_URL2);
-//
-//
-////        request = new JsonArrayRequest(BASE_OPENWEATHERMAP_URL2, new Response.Listener<JSONArray>() {
-//        request = new JsonArrayRequest(BASE_OPENWEATHERMAP_URL2, new Response.Listener<JSONArray>() {
-//
-//
-//            @Override
-//            public void onResponse(JSONArray response) {
-//
-//                JSONObject jsonObject = null;
-//
-//                System.out.println("API Call" + BASE_OPENWEATHERMAP_URL2);
-//
-//                for(int i = 0; i < response.length(); i++){
-//
-//                    try{
-//                        System.out.println("We in here!");
-//
-//                        jsonObject = response.getJSONObject(i);
-//                        Model_Forecast forecast = new Model_Forecast();
-//                        Model_Address address = new Model_Address();
-//
-////                        JSONObject JSONObject_City = jsonObject.getJSONObject("city");
-//
-//                        JSONObject JSONArray_list = jsonObject.getJSONObject("list");
-//
-//
-////                        address.setCity(JSONObject_City.getString("name"));
-//
-//                        forecast.setMinTemp(JSONArray_list.getDouble("min"));
-//
-//
-////                        address.setCity(jsonObject.getString("name");
-//
-//
-//
-//                        System.out.println("Min Temp: " +  JSONArray_list.getDouble("min"));
-//
-
-//
-//                    }
-//                    catch (JSONException e){
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            }
-//        } , new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                if (error == null || error.networkResponse == null) {
-//                    return;
-//                }
-//
-//                String body;
-//                //get status code here
-//                final String statusCode = String.valueOf(error.networkResponse.statusCode);
-//                //get response body and parse with appropriate encoding
-//                System.out.println("Status Code: " + statusCode);
-//                try {
-//                    body = new String(error.networkResponse.data, "UTF-8");
-//                    System.out.println("Body Print: " + body);
-//
-//                } catch (UnsupportedEncodingException e) {
-//                    // exception
-//
-//                }
-//
-//                System.out.println("Status Code: " + statusCode);
-//
-//                //do stuff with the body...            }
-//            }
-//        });
-//
-//        requestQueue = Volley.newRequestQueue(Activity_Main.this);
-//        requestQueue.add(request);
-
-
-        // Creating volley request obj
-//        JsonArrayRequest request = new JsonArrayRequest(BASE_OPENWEATHERMAP_URL2,
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                (Request.Method.GET, BASE_OPENWEATHERMAP_URL2, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-                        hidePDialog();
-                        System.out.println("On Response: " + response.toString());
-
-
-                        // Parsing json
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-
-                                JSONObject obj = response.getJSONObject("city");
-                                System.out.println("City is: " + obj.get("city"));
-
-//                                Model model = new Model();
-//                                model.setTitle(obj.getString("title"));
-//                                model.setCategory(obj.getString("category"));
-//                                model.setThumbnailUrl(obj.getString("image"));
-
-//                                modelList.add(model);
-
-                            } catch (JSONException e) {
-                                System.out.println("ERROR!: " + e.getMessage());
-
-                                e.printStackTrace();
-                            }
-
-                        }
-                        // notifying list adapter about data changes so that it renders the list view with updated data
-//                        adapter.notifyDataSetChanged();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-                System.out.println("In Here Error!: " + error.getMessage());
-
-                hidePDialog();
-
-            }
-        });
-
-    }
-
     public void generateDummyData() {
-        for (int i = 0; i < 10; i++) {
-            Model_Forecast forecast = new Model_Forecast(i, i, i, i, String.valueOf(i));
-            models.add(forecast);
-        }
+//        for (int i = 0; i < 10; i++) {
+//            Model_Forecast forecast = new Model_Forecast(i, i, i, i, String.valueOf(i));
+//            models.add(forecast);
+//        }
     }
 
     public void objectRequest() {
@@ -307,28 +164,144 @@ public class Activity_Main extends AppCompatActivity
             @Override
             public void onResponse(JSONObject response) {
 
-                //                        /*************** Example JSON Response **********************
-//                                {"cod":"200","message":0.0032,
-//                                    "city":{"id":1851632,"name":"Shuzenji",
-//                                    "coord":{"lon":138.933334,"lat":34.966671},
-//                                    "country":"JP"},
-//                                    "cnt":10,
-//                                    "list":[{
-//                                        "dt":1406080800,
-//                                        "temp":{
-//                                            "day":297.77,
-//                                            "min":293.52,
-//                                            "max":297.77,
-//                                            "night":293.52,
-//                                            "eve":297.77,
-//                                            "morn":297.77},
-//                                        "pressure":925.04,
-//                                        "humidity":76,
-//                                        "weather":[{"id":803,"main":"Clouds","description":"broken clouds","icon":"04d"}],}
-//                                            ]}
-//
-//                         *******************************************************************/
-//
+               /*******************************************
+                        -  Example JSON RESPONSE -
+
+               {
+                    "cod":"200",
+                        "message":0.0042,
+                        "cnt":38,
+                        "list":[
+                    {
+                        "dt":1533276000,
+                            "main":{
+                        "temp":298.81,
+                                "temp_min":298.685,
+                                "temp_max":298.81,
+                                "pressure":1010.75,
+                                "sea_level":1029.94,
+                                "grnd_level":1010.75,
+                                "humidity":58,
+                                "temp_kf":0.13
+                    },
+                        "weather":[
+                        {
+                            "id":800,
+                                "main":"Clear",
+                                "description":"clear sky",
+                                "icon":"01d"
+                        }
+         ],
+                        "clouds":{
+                        "all":0
+                    },
+                        "wind":{
+                        "speed":2.41,
+                                "deg":309.506
+                    },
+                        "sys":{
+                        "pod":"d"
+                    },
+                        "dt_txt":"2018-08-03 06:00:00"
+                    },
+                    {
+                        "dt":1533286800,
+                            "main":{
+                        "temp":301.06,
+                                "temp_min":300.976,
+                                "temp_max":301.06,
+                                "pressure":1009.32,
+                                "sea_level":1028.56,
+                                "grnd_level":1009.32,
+                                "humidity":53,
+                                "temp_kf":0.09
+                    },
+                        "weather":[
+                        {
+                            "id":800,
+                                "main":"Clear",
+                                "description":"clear sky",
+                                "icon":"01d"
+                        }
+         ],
+                        "clouds":{
+                        "all":0
+                    },
+                        "wind":{
+                        "speed":3.47,
+                                "deg":319.003
+                    },
+                        "sys":{
+                        "pod":"d"
+                    },
+                        "dt_txt":"2018-08-03 09:00:00"
+                    },
+                    {
+                        "dt":1533297600,
+                            "main":{
+                        "temp":302.07,
+                                "temp_min":302.027,
+                                "temp_max":302.07,
+                                "pressure":1007.72,
+                                "sea_level":1026.85,
+                                "grnd_level":1007.72,
+                                "humidity":46,
+                                "temp_kf":0.04
+                    },
+                        "weather":[
+                        {
+                            "id":800,
+                                "main":"Clear",
+                                "description":"clear sky",
+                                "icon":"01d"
+                        }
+         ],
+                        "clouds":{
+                        "all":0
+                    },
+                        "wind":{
+                        "speed":3.76,
+                                "deg":314.501
+                    },
+                        "sys":{
+                        "pod":"d"
+                    },
+                        "dt_txt":"2018-08-03 12:00:00"
+                    },
+                    {
+                        "dt":1533308400,
+                            "main":{
+                        "temp":301.394,
+                                "temp_min":301.394,
+                                "temp_max":301.394,
+                                "pressure":1006.45,
+                                "sea_level":1025.5,
+                                "grnd_level":1006.45,
+                                "humidity":43,
+                                "temp_kf":0
+                    },
+                        "weather":[
+                        {
+                            "id":801,
+                                "main":"Clouds",
+                                "description":"few clouds",
+                                "icon":"02d"
+                        }
+         ],
+                        "clouds":{
+                        "all":12
+                    },
+                        "wind":{
+                        "speed":4.36,
+                                "deg":306.505
+                    },
+                        "sys":{
+                        "pod":"d"
+                    },
+                        "dt_txt":"2018-08-03 15:00:00"
+                    },
+
+                    *************************************************************/
 
                 Log.d("TAG", "JSONObj response=" + response);
 
@@ -336,19 +309,33 @@ public class Activity_Main extends AppCompatActivity
                         JSONArray list = response.getJSONArray("list");
                         Log.d("TAG", "JSONObj list=" + list);
 
-                        JSONObject mainObj = list.getJSONObject(0).getJSONObject("main");
-                        Log.d("TAG", "JSONObj temp=" + mainObj);
+                        for(int i = 0; i < list.length(); i++) {
+
+                            JSONObject mainObj = list.getJSONObject(i).getJSONObject("main");
+                            JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
+                            JSONArray weatherArray = list.getJSONObject(i).getJSONArray("weather");
+
+                            String dateTime = list.getJSONObject(i).getString("dt_txt");
+                            String main_weather_description = weatherArray.getJSONObject(0).getString("main");
 
 
-                        Double currentTemp = mainObj.getDouble("temp");
-                        Double minTemp = mainObj.getDouble("temp_min");
-                        Double maxTemp = mainObj.getDouble("temp_max");
+                            Double currentTemp = mainObj.getDouble("temp");
+                            Double minTemp = mainObj.getDouble("temp_min");
+                            Double maxTemp = mainObj.getDouble("temp_max");
+                            Double humidity = mainObj.getDouble("humidity");
+                            Double windspeed = windObj.getDouble("speed");
 
-                        Log.d("TAG", "currentTemp=" + Double.toString(currentTemp));
-                        Log.d("TAG", "Min temp=" + Double.toString(minTemp));
-                        Log.d("TAG", "Max temp=" + Double.toString(maxTemp));
+                            int weatherID = weatherArray.getJSONObject(0).getInt("id");
+
+                            Log.v(TAG, "Returned Weather: " + weatherID);
 
 
+                            int weatherIcon_DrawableID = getWeatherIconDrawablePath(weatherID);
+
+
+                            models.add(new Model_Forecast(currentTemp, minTemp, maxTemp, humidity, windspeed, main_weather_description, dateTime, weatherIcon_DrawableID));
+
+                        }
 
                     }catch (JSONException e) {
                         e.printStackTrace();
@@ -374,6 +361,66 @@ public class Activity_Main extends AppCompatActivity
             pDialog.dismiss();
             pDialog = null;
         }
+    }
+
+    /* OpenWeatherMAP API uses an ID to categorize it's weather.
+       getWeatherIconDrawablePath assigns the drawableID to the weatherID returned by OpenWeatherMap
+       EX: If OpenWeatherMAP Api returns a Weather ID of 2xx, then it will be some form of Thunderstorms
+       DOCUMENTATION: https://openweathermap.org/weather-conditions
+     */
+
+    private int getWeatherIconDrawablePath(int weatherID) {
+
+        int drawableId;
+
+        // Group 2xx: Thunderstorm
+        if (weatherID >= 200 && weatherID <= 299){
+        drawableId = getResources().getIdentifier("storm_64", "drawable", getPackageName());
+        return drawableId;
+        }
+            // Group 3xx: Drizzle
+        else if(weatherID >= 300 && weatherID <= 399) {
+            drawableId = getResources().getIdentifier("rain_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
+//             case 3: if(weatherID >= 400 && weatherID <= 499);
+//                return weatherIcon_DrawablePath = "";
+
+                // Group 5xx: Rain
+        else if(weatherID >= 500 && weatherID <= 599) {
+            drawableId = getResources().getIdentifier("rain_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
+                // Group 6xx: Snow
+        else if(weatherID >= 500 && weatherID <= 599) {
+            drawableId = getResources().getIdentifier("snow_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
+            // Group 7xx: Atmosphere
+        else if(weatherID >= 500 && weatherID <= 599) {
+            drawableId = getResources().getIdentifier("windy_weather_64", "drawable", getPackageName());
+            return drawableId;
+        }
+            // Group 800: Clear
+        else if(weatherID == 800) {
+            drawableId = getResources().getIdentifier("sun_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
+            // Group 80x: Clouds
+        else if(weatherID >= 801 && weatherID <= 809) {
+            drawableId = getResources().getIdentifier("clouds_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
+        else{
+            drawableId = getResources().getIdentifier("sun_64", "drawable", getPackageName());
+            return drawableId;
+        }
+
     }
 
 }

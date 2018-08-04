@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -24,7 +25,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
     private final List<Model_Forecast> mValues;
     private final OnFragmentInteractionListener mListener;
 
-    private TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date;
+    private TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date, tv_weatherDescription;
+    private ImageView iv_weatherIcon;
 
 //    public Adapter_RecyclerView_Detail_Item(List<DummyItem> items, OnFragmentInteractionListener listener) {
     public Adapter_RecyclerView_Detail_Item(List<Model_Forecast> items, OnFragmentInteractionListener listener) {
@@ -42,6 +44,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
         tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
         tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
         tv_date =  (TextView) view.findViewById(R.id.tv_date);
+        tv_weatherDescription = (TextView) view.findViewById(R.id.tv_weather_description);
+        iv_weatherIcon = (ImageView) view.findViewById(R.id.forecast_iv_thumbnail);
 
         return new ViewHolder(view);
     }
@@ -53,9 +57,16 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 //        holder.mContentView.setText(mValues.get(position).content);
 
         holder.tv_dayOfWeek.setText("Today");
+        holder.tv_date.setText(mValues.get(position).getDate());
         holder.tv_dayTemp.setText(Double.toString(mValues.get(position).getMaxTemp()));
         holder.tv_nightTemp.setText(Double.toString(mValues.get(position).getMinTemp()));
-        holder.tv_currentTemp.setText("77F");
+        holder.tv_currentTemp.setText(Double.toString(mValues.get(position).getCurrentTemp()));
+        holder.tv_weatherDescription.setText(mValues.get(position).getDescription());
+        holder.iv_weatherIcon.setImageResource(mValues.get(position).getDrawableID());
+
+
+//        android:id="@+id/forecast_iv_thumbnail"
+
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +100,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 //        }
 
         public final View mView;
-        public final TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date;
+        public final TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_dayOfWeek, tv_date, tv_weatherDescription;
+        public final ImageView iv_weatherIcon;
 //        public DummyItem mItem;
         public Model_Forecast mItem;
 
@@ -101,6 +113,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
             tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
             tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
             tv_date =  (TextView) view.findViewById(R.id.tv_date);
+            tv_weatherDescription =  (TextView) view.findViewById(R.id.tv_weather_description);
+            iv_weatherIcon = (ImageView) view.findViewById(R.id.forecast_iv_thumbnail);
 
         }
 
