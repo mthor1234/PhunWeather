@@ -25,7 +25,7 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
     private final List<Model_Forecast> mValues;
     private final OnFragmentInteractionListener mListener;
 
-    private TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_date, tv_weatherDescription;
+    private TextView tv_minTemp, tv_maxTemp, tv_currentTemp, tv_date, tv_weatherDescription;
     private ImageView iv_weatherIcon;
 
 //    public Adapter_RecyclerView_Detail_Item(List<DummyItem> items, OnFragmentInteractionListener listener) {
@@ -39,8 +39,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.forecast_row_item, parent, false);
 
-        tv_dayTemp =  (TextView) view.findViewById(R.id.tv_daytemp);
-        tv_nightTemp =  (TextView) view.findViewById(R.id.tv_nighttemp);
+        tv_maxTemp =  (TextView) view.findViewById(R.id.tv_maxtemp);
+        tv_maxTemp =  (TextView) view.findViewById(R.id.tv_mintemp);
         tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
 //        tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
         tv_date =  (TextView) view.findViewById(R.id.tv_date);
@@ -55,8 +55,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
         holder.mItem = mValues.get(position);
 //        holder.tv_dayOfWeek.setText("Today");
         holder.tv_date.setText(mValues.get(position).getDate());
-        holder.tv_dayTemp.setText(Double.toString(mValues.get(position).getMaxTemp()));
-        holder.tv_nightTemp.setText(Double.toString(mValues.get(position).getMinTemp()));
+        holder.tv_maxTemp.setText(Double.toString(mValues.get(position).getMaxTemp()));
+        holder.tv_minTemp.setText(Double.toString(mValues.get(position).getMinTemp()));
         holder.tv_currentTemp.setText(Double.toString(mValues.get(position).getCurrentTemp()));
         holder.tv_weatherDescription.setText(mValues.get(position).getDescription());
         holder.iv_weatherIcon.setImageResource(mValues.get(position).getDrawableID());
@@ -96,7 +96,7 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 //        }
 
         public final View mView;
-        public final TextView tv_dayTemp, tv_nightTemp, tv_currentTemp, tv_date, tv_weatherDescription;
+        public final TextView tv_maxTemp, tv_minTemp, tv_currentTemp, tv_date, tv_weatherDescription;
         public final ImageView iv_weatherIcon;
 //        public DummyItem mItem;
         public Model_Forecast mItem;
@@ -104,8 +104,8 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            tv_dayTemp =  (TextView) view.findViewById(R.id.tv_daytemp);
-            tv_nightTemp =  (TextView) view.findViewById(R.id.tv_nighttemp);
+            tv_maxTemp =  (TextView) view.findViewById(R.id.tv_maxtemp);
+            tv_minTemp =  (TextView) view.findViewById(R.id.tv_mintemp);
             tv_currentTemp =  (TextView) view.findViewById(R.id.tv_currenttemp);
 //            tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
             tv_date =  (TextView) view.findViewById(R.id.tv_date);

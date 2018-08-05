@@ -25,10 +25,8 @@ import async.crash.com.phunweather.R;
 
 
 /*
-1) Added JSONParser class to clean up code and create a class dedicated towards API calls / parsing results
-2) Casted temperature doubles to ints, so they are more readable
-3) Removed tv_dayofthe week
-4) Formatted the date so it is now EEEE MMM dd, yyyy
+List of Changes Made Since Last Push
+1)
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -74,6 +72,11 @@ public class Activity_Main extends AppCompatActivity
         JSONParser jsonParser = new JSONParser();
 
         models = jsonParser.fiveDayForecast(this);
+
+        for(Model_Forecast model: models){
+            System.out.println("Min Temp: " + model.getMinTemp());
+            System.out.println("Max Temp: " + model.getMaxTemp());
+        }
 
 
 

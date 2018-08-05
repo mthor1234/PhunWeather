@@ -35,7 +35,9 @@ public class JSONParser {
     private static final String BASE_OPENWEATHERMAP_URL2 = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial";
 
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private SimpleDateFormat updateddateFormat = new SimpleDateFormat("EEEE MMM dd, yyyy");
 
 
 
@@ -139,53 +141,92 @@ public class JSONParser {
                     Log.d("TAG", "JSONObj list=" + list);
                     Log.d("TAG", "JSONObj length=" + list.length());
 
+
+                    String previousDate = "";
+
+
+                    Model_Forecast forecast_Model = new Model_Forecast();
+
                     for(int i = 0; i < list.length(); i++) {
 
                         JSONObject mainObj = list.getJSONObject(i).getJSONObject("main");
                         JSONObject windObj = list.getJSONObject(i).getJSONObject("wind");
                         JSONArray weatherArray = list.getJSONObject(i).getJSONArray("weather");
-
                         String date = list.getJSONObject(i).getString("dt_txt");
 
+
                         // Format date
-                        //date = formatDate(date);
+                        date = formatDate(date);
+//                        Log.d("TAG", "Date=" + date);
+
+
+                        // New Day
+                        if(!previousDate.matches(date)){
+
+                            if(i != 0) {
+                                // 1. Create a Model_Forecast object (This is a weather forecast)
+                                // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
+
+                                System.out.println("i: " + i + " Previous Date: " + previousDate + " date: " + date +  "Adding the previous forecast_model");
+//                                forecast_Model.print();
+
+                                forecast_Model.calculateAverageTemp();
+                                forecast_Model.calculateWeatherIcon();
+                                forecast.add(forecast_Model);
+                            }
+
+                            System.out.println("i: " + i + " Adding New Forecast");
+                            forecast_Model = new Model_Forecast();
+
+                            forecast_Model.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                            forecast_Model.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                            forecast_Model.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                            forecast_Model.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(context,weatherArray.getJSONObject(0).getInt("id")));
+                            forecast_Model.setDate(date);
+                            forecast_Model.addTime("Test Time");
+
+                            previousDate = date;
+
 
 
                         String main_weather_description = weatherArray.getJSONObject(0).getString("main");
-
-
-                        int currentTemp =  (int) Math.round(mainObj.getDouble("temp"));
-
-
-
-                        int  minTemp = (int) Math.round(mainObj.getDouble("temp_min"));
-                        int  maxTemp = (int) Math.round(mainObj.getDouble("temp_max"));
-
-
-
-                        int humidity = (int) Math.round(mainObj.getDouble("humidity"));
-                        int windspeed = (int) Math.round(windObj.getDouble("speed"));
 
                         int weatherID = weatherArray.getJSONObject(0).getInt("id");
 
                         int weatherIcon_DrawableID = getWeatherIconDrawablePath(context, weatherID);
 
-                        Log.d("TAG", "currentTemp list=" + currentTemp);
-                        Log.d("TAG", "minTemp list=" + minTemp);
-                        Log.d("TAG", "maxTemp list=" + maxTemp);
-                        Log.d("TAG", "humidity list=" + humidity);
+                    }
 
+                    // Same date, add values to ArrayList
+                        else{
+                            System.out.println("i: " + i + " Adding to old Forecast " + forecast_Model.getDate());
 
-                        // 1. Create a Model_Forecast object (This is a weather forecast)
-                        // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
-                        forecast.add(new Model_Forecast(currentTemp, minTemp, maxTemp, humidity, windspeed, main_weather_description, date, weatherIcon_DrawableID));
+//                            Log.v(TAG, "Adding to the arraylists");
+                            forecast_Model.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                            forecast_Model.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                            forecast_Model.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                            forecast_Model.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(context, weatherArray.getJSONObject(0).getInt("id")));
+
+                            forecast_Model.addTime(date.substring(13,19));
+                        }
 
                     }
 
+                    // Add the last forecast at the end of the loop
+                    forecast_Model.calculateAverageTemp();
+                    forecast_Model.calculateWeatherIcon();
+                    forecast.add(forecast_Model);
+
+
+
                 }catch (JSONException e) {
                     e.printStackTrace();
-               }
-               //catch (ParseException e) {
+               } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                //catch (ParseException e) {
 //                    e.printStackTrace();
 //                }
 
@@ -274,12 +315,12 @@ public class JSONParser {
      * TODO: 08-04 10:41:06.659 30370-30370/async.crash.com.phunweather W/System.err: java.text.ParseException: Unparseable date: "2018-08-05 15:00:00"
      */
     private String formatDate(String jsonDate) throws ParseException {
+
+
         Date newDate = dateFormat.parse(jsonDate);
 
 
-        dateFormat = new SimpleDateFormat("EEEE MMM dd, yyyy");
-
-        String date = dateFormat.format(newDate);
+        String date = updateddateFormat.format(newDate);
         return date;
 
     }

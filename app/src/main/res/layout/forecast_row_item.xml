@@ -29,22 +29,22 @@
             android:layout_alignParentLeft="true" />
 
         <TextView
-            android:id="@+id/tv_daytemp"
+            android:id="@+id/tv_mintemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Day 78F"
+            android:text=" 78F"
             android:textSize="20dp"
             android:layout_below="@id/tv_date" />
 
         <TextView
-            android:id="@+id/tv_nighttemp"
+            android:id="@+id/tv_maxtemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Night 71F"
             android:textSize="20dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/tv_daytemp"
-            android:layout_alignTop="@id/tv_daytemp"/>
+            android:layout_toRightOf="@id/tv_mintemp"
+            android:layout_alignTop="@id/tv_mintemp"/>
 
         <TextView
             android:id="@+id/tv_currenttemp"
@@ -53,10 +53,10 @@
             android:text="77F"
             android:textSize="55dp"
             android:textStyle="bold"
-            android:layout_below="@id/tv_daytemp"
+            android:layout_below="@id/tv_mintemp"
             android:layout_marginLeft="10dp"
-            android:layout_alignLeft="@id/tv_daytemp"
-            android:layout_alignRight="@id/tv_nighttemp"
+            android:layout_alignLeft="@id/tv_mintemp"
+            android:layout_alignRight="@id/tv_maxtemp"
             android:textAlignment="center"/>
 
 
