@@ -2,6 +2,7 @@ package async.crash.com.phunweather.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -22,7 +23,10 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Detail_Item;
@@ -39,39 +43,26 @@ import async.crash.com.phunweather.R;
 /*
 List of Changes Made Since Last Push
 
-1) Adapter now updates once the Volley response is parsed and all the items have been added to the forecast.
-   Done by having JSONParser call activity_main.updateFragment_DetailAdapater(); which is a linked up via interfaces
-   to the Fragment_Detail. Interfaces are used because that is the preferred method for communicating with Fragments
+1) Landscape orientation was causing EditText and IME to take up the entire screen.
 
-2) Appended "F" to all the temperature fields under fragment_row_item.xml.
-   Consider updating the View_Model to hold a string version of the temperature in order for it to support:
-        - Celsius & Farhenheit
-        - Cleaner Code
-        - More flexible by having a String version and an int version
-3) Made the input type for SearchView numbers only
+        - Fixed it by adding the following to et_zipcode under the toolbar.xml:
+        android:imeOptions="actionDone|flagNoExtractUi" />
 
-4) Added a ProcessDialog for network operations
-    - Shows during the operation
-    - Hides once the network operation is over and fragment_detail_adapter has update or a network error
+2) Added GSON Dependency
 
-5) Added a SnackBar to display a network error if one occurs
+3) Added saving/persisting data by using SharedPreferences
+    - Methods added: saveData() and loadData()
+    - Convert al_zipcodes to JSON by using GSON library
+    - Recover al_zipcodes from SharedPreferences
 
-6) Adjusted the Toolbar to have a Settings button & EditText
-   - Replaced SearchView with EditText (Easier to use, and not searching anything)
-            * No longer trying to use API calls to verify zipcodes dynamically.
-            *Too much work for the limited amount of time, limited API calls, and may affect performance
+4) Got rid of et_zipcode getting focus by default by adding the following to the root layout
+    - android:focusableInTouchMode="true">from et_zipcode in toolbar.xml
 
-   - Settings button is on the far left
+5) Added swiping ability to delete zipcodes
+    - Implemented this by using the following tutorial
+      https://www.androidhive.info/2017/09/android-recyclerview-swipe-delete-undo-using-itemtouchhelper/
 
-5) Model_Address refactored to Model_Zipcode
-
-7) Deleted Adapter_AddressSearch
-
-8) Refactored Adapater_MyItemRecyclerView -> Adapter_RecyclerView_Zipcode
-
-9) Refactored fragment_zipcode_itemode_item.xml -> fragment_zipcode_item.xml
-
-10) Removed
+6) Prevent duplicate zipcode entries with the method: checkDuplicateZipCodeEntry
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -99,9 +90,12 @@ public class Activity_Main extends AppCompatActivity
     private StringRequest mStringRequest;
 
 
+
+
 // ------ Fragments ------ //
     private Fragment fragment_detail;
     private Fragment fragment_zip;
+    private Fragment mContent; // Keeps Instance State
 
 
 
@@ -111,8 +105,7 @@ public class Activity_Main extends AppCompatActivity
     private Interface_Communicate_With_Adapter listener_Zipcode_Fragment;
 
 
-
-    // ------ Views ------ //
+// ------ Views ------ //
     private ImageButton imgBtn_settings;
     private EditText et_enterZip;
 
@@ -129,52 +122,69 @@ public class Activity_Main extends AppCompatActivity
     private ArrayList<Model_Zipcode> al_zipCodes;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-//--------- Setting Views ---------- //
+        // TODO: GETTING ERRORS TRYING TO RETAIN THIS FRAGMENT FIX THIS IN THE MORNING!!!!!!
+//        if(savedInstanceState != null){
+//            //Restore the fragment's instance
+//            System.out.println("Saved Instance State");
+//            fragment_zip = getSupportFragmentManager().getFragment(savedInstanceState, "Fragment_Zipcode");
+//            al_zipCodes = Fragment_Zipcode.getAl_zipCodes();
+//        }
+//        else{
+//            System.out.println("Not Saved Instance State");
+//
+//            models = new ArrayList<Model_Forecast>();
+//            al_zipCodes = new ArrayList<Model_Zipcode>();
+//
+//            //--------- Fragment ---------- //
+//                // Create the Zipcode Fragment & Fragment Manager
+//                fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
+//            }
 
-        // ToolBar & removing toolbar title
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-
-        et_enterZip = (EditText) findViewById(R.id.et_zipcode);
-        imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
 
 
-        //--------- End Setting Views ---------- //
 
-
-        models = new ArrayList<Model_Forecast>();
-        al_zipCodes = new ArrayList<Model_Zipcode>();
-
-
-        pDialog = new ProgressDialog(this);
-
+        loadData();
 
         //--------- Fragment ---------- //
         // Create the Zipcode Fragment & Fragment Manager
         fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
 
-        // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
-        set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
+
+        models = new ArrayList<Model_Forecast>();
+
+            // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
+            set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
+
+            //--------- Setting Views ---------- //
+
+            // ToolBar & removing toolbar title
+            Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+            toolbar.setTitle("");
+            setSupportActionBar(toolbar);
+
+            et_enterZip = (EditText) findViewById(R.id.et_zipcode);
+            imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
 
 
-        FragmentManager fm = getSupportFragmentManager();
+            //--------- End Setting Views ---------- //
 
-        // Replace the Fragment
-        fm.beginTransaction()
-                .replace(R.id.fragment_container, fragment_zip)
-                .addToBackStack(null)
-                .commit();
 
-        //--------- End of Fragment ---------- //
+
+            FragmentManager fm = getSupportFragmentManager();
+
+            // Replace the Fragment
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment_zip)
+                    .addToBackStack("fragment_container")
+                    .commit();
+
+            //--------- End of Fragment ---------- //
 
 
         //--------- Click Listeners ---------- //
@@ -268,6 +278,10 @@ public class Activity_Main extends AppCompatActivity
     }
 
     public void startProcessDialog(){
+        if(pDialog == null){
+            pDialog = new ProgressDialog(this);
+        }
+
         if (!pDialog.isShowing()) {
             pDialog.setMessage("Loading...");
             pDialog.show();
@@ -297,23 +311,40 @@ public class Activity_Main extends AppCompatActivity
               false: Display an unsuccessful Snackbar to the user
   */
     public void addZipCode() {
+
+
         String enteredZipcode = et_enterZip.getText().toString();
+
         if(enteredZipcode.length() == 5) {
-            Snackbar.make(this.findViewById(R.id.fragment_container), "Zipcode: " + enteredZipcode + " Has Been Added!", Snackbar.LENGTH_SHORT).show();
-            et_enterZip.setText("");
 
-            al_zipCodes.add(new Model_Zipcode(enteredZipcode.toString()));
-            // Updates the adapter so the newly created Model_Zipcode is added and displayed on the Recyclerview
-            updateFragment_ZipcodeAdapater();
+            if(!checkDuplicateZipCodeEntry(enteredZipcode)) {
+                Snackbar.make(this.findViewById(R.id.fragment_container), "Zipcode: " + enteredZipcode + " Has Been Added!", Snackbar.LENGTH_SHORT).show();
+                et_enterZip.setText("");
 
-
-        }else{
-            Snackbar.make(this.findViewById(R.id.fragment_container), "Zipcode Must be Five Digits! Try Again", Snackbar.LENGTH_SHORT).show();
-
+                al_zipCodes.add(new Model_Zipcode(enteredZipcode.toString()));
+                // Updates the adapter so the newly created Model_Zipcode is added and displayed on the Recyclerview
+                updateFragment_ZipcodeAdapater();
+            }
         }
-
+        else{
+            Snackbar.make(this.findViewById(R.id.fragment_container), "Zipcode Must be Five Digits! Try Again", Snackbar.LENGTH_SHORT).show();
+        }
     }
 
+    // Checks to see if the zipcode entered matches a zipcode already entered
+    // Prevents duplicates
+    public boolean checkDuplicateZipCodeEntry(String zipcode){
+        for(Model_Zipcode item : al_zipCodes){
+            if(item.getZipcode().contains(zipcode)){
+                // Already contains zipcode
+                Snackbar.make(this.findViewById(R.id.fragment_container), "This Zip Code Has Already Been Added", Snackbar.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+        return false;
+    }
+    // Hides the softkeyboard
+    //  - Used when a another fragment is added
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         //Find the currently focused view, so we can grab the correct window token from it.
@@ -323,5 +354,47 @@ public class Activity_Main extends AppCompatActivity
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+
+// -------------- DATA Persistence ----------------- //
+
+    // TODO: Need to save the currently attached fragment or possibly both fragments?????
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        saveData();
+
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, "Fragment_Zipcode", fragment_zip);
+    }
+
+    // Save data to shared preferences
+    //  1) GrabShared Preferences Obj
+    //  2) Create Gson Object
+    //  3) Save arraylist of zipcodes as JSON by using GSON
+    private void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(al_zipCodes);
+        editor.putString("task list", json);
+        editor.apply();
+    }
+
+    // Recover data from SharedPreferences
+    private void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("task list", null);
+        Type type = new TypeToken<ArrayList<Model_Zipcode>>(){}.getType();
+        al_zipCodes = gson.fromJson(json, type);
+
+        if (al_zipCodes == null){
+            al_zipCodes = new ArrayList<Model_Zipcode>();
+        }
+
+
     }
 }

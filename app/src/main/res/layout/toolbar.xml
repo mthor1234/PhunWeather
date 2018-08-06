@@ -7,7 +7,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -30,7 +31,8 @@
         android:textColor="@color/white"
         android:background="@android:color/transparent"
             android:singleLine="true"
-            android:imeOptions="actionDone" />/>
+            android:focusedByDefault="false"
+            android:imeOptions="actionDone|flagNoExtractUi" />
 
     </RelativeLayout>
 
