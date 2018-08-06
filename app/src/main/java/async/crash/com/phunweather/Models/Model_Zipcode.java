@@ -4,21 +4,32 @@ package async.crash.com.phunweather.Models;
  * Created by mitchthornton on 7/31/18.
  */
 
-public class Model_Address {
+public class Model_Zipcode {
 
     private String zipcode;
     private String city;
     private String state;
+    private String id;
 
-    public Model_Address(String zipcode, String city, String state) {
+// ------------- Constructors ------------------ //
+
+    //  Default Constructor //
+    public Model_Zipcode() {
+    }
+
+    public Model_Zipcode(String zipcode) {
+        this.zipcode = zipcode;
+    }
+
+    public Model_Zipcode(String zipcode, String city, String state) {
         this.zipcode = zipcode;
         this.city = city;
         this.state = state;
     }
 
-    public Model_Address() {
-    }
+// ------------- Constructors End --------------- //
 
+// ------------- Getters / Setters -------------- //
     public String getZipcode() {
         return zipcode;
     }
@@ -42,4 +53,19 @@ public class Model_Address {
     public void setState(String state) {
         this.state = state;
     }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    // ------------- Getters / Setters End  ----------- //
+
 }
+
+
+
+

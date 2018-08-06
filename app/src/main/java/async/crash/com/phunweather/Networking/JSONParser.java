@@ -1,6 +1,7 @@
 package async.crash.com.phunweather.Networking;
 
 import android.content.Context;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import async.crash.com.phunweather.Models.Model_Forecast;
+import async.crash.com.phunweather.R;
+import async.crash.com.phunweather.activities.Activity_Main;
 
 /**
  * Created by mitchthornton on 8/3/18.
@@ -34,11 +37,20 @@ public class JSONParser {
     private static final String OPENWEATERMAP_API = "ae1d2194a7816e11b58f5e4fcc19f195";
     private static final String BASE_OPENWEATHERMAP_URL2 = "http://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial";
 
+    private String zipcode;
+//    private Context context;
+    private Activity_Main activity_main;
+
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     private SimpleDateFormat updateddateFormat = new SimpleDateFormat("EEEE MMM dd, yyyy");
 
+    public JSONParser(final Activity_Main activity_main, String zipcode){
+//        this.context = context;
+//        this.zipcode = zipcode;
+        this.activity_main = activity_main;
+
+    }
 
 
     // Holds all of the weeks forecasts.
@@ -122,15 +134,19 @@ public class JSONParser {
                  "dt_txt":"2018-08-03 09:00:00"
                  },
     */
-    public ArrayList<Model_Forecast> fiveDayForecast(final Context context){
 
+    public void fiveDayForecast(){
+
+        // Start the process dialog to alert user of loading time
+        activity_main.startProcessDialog();
 
         final ArrayList<Model_Forecast> forecast = new ArrayList<Model_Forecast>();
 
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        RequestQueue requestQueue = Volley.newRequestQueue(activity_main);
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
-                BASE_OPENWEATHERMAP_URL2, null, new Response.Listener<JSONObject>() {
+                OPENWEATHERMAP_BASE_API_URL
+                , null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -172,7 +188,9 @@ public class JSONParser {
 
                                 forecast_Model.calculateAverageTemp();
                                 forecast_Model.calculateWeatherIcon();
-                                forecast.add(forecast_Model);
+                                activity_main.getModels().add(forecast_Model);
+
+//                                forecast.add(forecast_Model);
                             }
 
                             System.out.println("i: " + i + " Adding New Forecast");
@@ -182,7 +200,7 @@ public class JSONParser {
                             forecast_Model.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
                             forecast_Model.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
                             forecast_Model.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(context,weatherArray.getJSONObject(0).getInt("id")));
+                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(activity_main,weatherArray.getJSONObject(0).getInt("id")));
                             forecast_Model.setDate(date);
                             forecast_Model.addTime("Test Time");
 
@@ -194,7 +212,7 @@ public class JSONParser {
 
                         int weatherID = weatherArray.getJSONObject(0).getInt("id");
 
-                        int weatherIcon_DrawableID = getWeatherIconDrawablePath(context, weatherID);
+                        int weatherIcon_DrawableID = getWeatherIconDrawablePath(activity_main, weatherID);
 
                     }
 
@@ -207,7 +225,7 @@ public class JSONParser {
                             forecast_Model.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
                             forecast_Model.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
                             forecast_Model.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(context, weatherArray.getJSONObject(0).getInt("id")));
+                            forecast_Model.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
 
                             forecast_Model.addTime(date.substring(13,19));
                         }
@@ -217,7 +235,17 @@ public class JSONParser {
                     // Add the last forecast at the end of the loop
                     forecast_Model.calculateAverageTemp();
                     forecast_Model.calculateWeatherIcon();
-                    forecast.add(forecast_Model);
+
+                    // Add the final forecast_Model to the activity_main models ArrayList<Forecast_Model>
+                    activity_main.getModels().add(forecast_Model);
+
+
+                    // Updates adapter via Activity -> Fragment communication
+                    // Utilizes an interface
+                    activity_main.updateFragment_DetailAdapater();
+
+                    // Hides the process dialog, letting the user know that the background operation is over
+                    activity_main.hidePDialog();
 
 
 
@@ -238,13 +266,17 @@ public class JSONParser {
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d("TAG", "JSONObj Error: " + error.getMessage());
                 //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-                // hide the progress dialog
+
+                // If errored out, hide the progress dialog
+                activity_main.hidePDialog();
+
+                Snackbar.make(activity_main.findViewById(R.id.fragment_container), "Unable to fetch information. Try again", Snackbar.LENGTH_SHORT).show();
             }
         });
 
         requestQueue.add(jsonObjReq);
 
-        return forecast;
+        //return forecast;
     }
 
 
@@ -324,7 +356,4 @@ public class JSONParser {
         return date;
 
     }
-
-
-
 }

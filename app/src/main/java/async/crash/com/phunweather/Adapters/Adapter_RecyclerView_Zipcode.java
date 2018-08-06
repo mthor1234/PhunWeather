@@ -9,20 +9,21 @@ import android.widget.TextView;
 import java.util.List;
 
 import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
+import async.crash.com.phunweather.Models.Model_Zipcode;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.Models.DummyContent.DummyItem;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Model_Zipcode} and makes a call to the
  * specified {@link Fragment_Zipcode.OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class Adapter_MyItemRecyclerView extends RecyclerView.Adapter<Adapter_MyItemRecyclerView.ViewHolder> {
+public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_RecyclerView_Zipcode.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Model_Zipcode> mValues;
     private final Fragment_Zipcode.OnListFragmentInteractionListener mListener;
 
-    public Adapter_MyItemRecyclerView(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
+//    public Adapter_RecyclerView_Zipcode(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
+    public Adapter_RecyclerView_Zipcode(List<Model_Zipcode> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -30,15 +31,15 @@ public class Adapter_MyItemRecyclerView extends RecyclerView.Adapter<Adapter_MyI
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.fragment_zipcode_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mIdView.setText(mValues.get(position).getId());
+        holder.mContentView.setText(mValues.get(position).getZipcode());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +62,7 @@ public class Adapter_MyItemRecyclerView extends RecyclerView.Adapter<Adapter_MyI
         public final View mView;
         public final TextView mIdView;
         public final TextView mContentView;
-        public DummyItem mItem;
+        public Model_Zipcode mItem;
 
         public ViewHolder(View view) {
             super(view);

@@ -277,11 +277,14 @@ public class Model_Forecast {
 
 
     // TODO: Create a method to generate the most common icon
+    // Needs to match the description
     public void calculateWeatherIcon(){
 //        for(int id: weatherIcons){
 //
 //        }
-        drawableID =  weatherIcons.get(3);
+        if(weatherIcons.size() > 0) {
+            drawableID = weatherIcons.get(0);
+        }
 
     }
 //

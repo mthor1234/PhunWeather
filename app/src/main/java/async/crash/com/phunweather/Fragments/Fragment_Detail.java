@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Detail_Item;
+import async.crash.com.phunweather.Interfaces.Interface_Communicate_With_Adapter;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
 
@@ -22,7 +24,8 @@ import async.crash.com.phunweather.R;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class Fragment_Detail extends Fragment {
+public class Fragment_Detail extends Fragment
+implements Interface_Communicate_With_Adapter {
 
     private static final String TAG = Fragment_Detail.class.getSimpleName();
 
@@ -43,7 +46,10 @@ public class Fragment_Detail extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private RecyclerView.Adapter adapter;
+
     private static ArrayList<Model_Forecast> weather_forecast;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,7 +68,6 @@ public class Fragment_Detail extends Fragment {
         return fragment;
     }
 
-//    public static Fragment_Detail newInstance(String param1, String param2, ArrayList<Model_Forecast> forecast) {
     public static Fragment_Detail newInstance(ArrayList<Model_Forecast> forecast) {
         Fragment_Detail fragment = new Fragment_Detail();
         Bundle args = new Bundle();
@@ -70,7 +75,6 @@ public class Fragment_Detail extends Fragment {
 //        args.putString(ARG_PARAM2, param2);
 
         weather_forecast = forecast;
-
 
         fragment.setArguments(args);
         return fragment;
@@ -80,15 +84,20 @@ public class Fragment_Detail extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Toolbar toolbar= (Toolbar) getActivity().findViewById(R.id.tool_bar);
+
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -99,11 +108,19 @@ public class Fragment_Detail extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-//            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(Model_Forecast.ITEMS, mListener));
+
+            System.out.println("Preupdate: Size of Forecast: " + weather_forecast.size());
+
+
             recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
+            adapter = recyclerView.getAdapter();
+
+
         }
+
         return view;
     }
+
 
 
     @Override
@@ -123,6 +140,15 @@ public class Fragment_Detail extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void updateAdapater() {
+        adapter.notifyDataSetChanged();
+    }
+
+    // Overrides from Interface_Communicate_With_Adapater
+
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -138,7 +164,10 @@ public class Fragment_Detail extends Fragment {
 //        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
 //    }
 
+
     public interface OnFragmentInteractionListener {
-        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
+        void onListFragmentInteraction(Model_Forecast item);
     }
+
+
 }

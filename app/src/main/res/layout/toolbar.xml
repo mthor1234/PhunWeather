@@ -4,4 +4,34 @@
     android:elevation="4dp"
     android:background="@color/colorPrimary">
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings" />
+
+        <EditText
+        android:id="@+id/et_zipcode"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:hint="Add Zip Code"
+            android:textColorHint="@color/white"
+        android:maxLength="5"
+        android:inputType="number"
+        android:layout_centerInParent="true"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:background="@android:color/transparent"
+            android:singleLine="true"
+            android:imeOptions="actionDone" />/>
+
+    </RelativeLayout>
+
 </android.support.v7.widget.Toolbar>

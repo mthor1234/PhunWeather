@@ -10,8 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import async.crash.com.phunweather.Adapters.Adapter_MyItemRecyclerView;
-import async.crash.com.phunweather.Models.DummyContent;
+import java.util.ArrayList;
+
+import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Zipcode;
+import async.crash.com.phunweather.Interfaces.Interface_Communicate_With_Adapter;
+import async.crash.com.phunweather.Models.Model_Zipcode;
 import async.crash.com.phunweather.R;
 
 /**
@@ -20,13 +23,19 @@ import async.crash.com.phunweather.R;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class Fragment_Zipcode extends Fragment {
+public class Fragment_Zipcode extends Fragment
+            implements Interface_Communicate_With_Adapter{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+
+    private static ArrayList<Model_Zipcode> al_zipCodes;
+
+    private RecyclerView recyclerView;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -37,17 +46,41 @@ public class Fragment_Zipcode extends Fragment {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static Fragment_Zipcode newInstance(int columnCount) {
+    public static Fragment_Zipcode newInstance(ArrayList<Model_Zipcode> items) {
         Fragment_Zipcode fragment = new Fragment_Zipcode();
+
+        al_zipCodes = items;
+
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
+
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        Toolbar toolbar= (Toolbar) getActivity().findViewById(R.id.tool_bar);
+
+        /*
+        TODO: Null pointers on toolbar items
+           Caused by: java.lang.NullPointerException: Attempt to invoke virtual method 'void android.widget.ImageButton.setOnClickListener(android.view.View$OnClickListener)' on a null object reference
+            at async.crash.com.phunweather.Fragments.Fragment_Zipcode.onCreateView(Fragment_Zipcode.java:154)
+         */
+
+        // ImageButtons
+//        imgBtn_settings = (ImageButton) toolbar.findViewById(R.id.action_settings);
+//        imgbtn_addZip = (ImageButton) toolbar.findViewById(R.id.zipcode_imgbtn_add);
+//
+//        // EditText
+//        et_enterZip = (EditText) toolbar.findViewById(R.id.et_zipcode);
+
+//        toolbar.inflateMenu(R.menu.menu_main);
+//        toolbar.setOnMenuItemClickListener(this);
+
+
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -62,14 +95,17 @@ public class Fragment_Zipcode extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+                recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new Adapter_MyItemRecyclerView(DummyContent.ITEMS, mListener));
+//            recyclerView.setAdapter(new Adapter_RecyclerView_Zipcode(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new Adapter_RecyclerView_Zipcode(al_zipCodes, mListener));
         }
+
+
         return view;
     }
 
@@ -91,24 +127,14 @@ public class Fragment_Zipcode extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyContent.DummyItem item);
+    @Override
+    public void updateAdapater() {
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
-//    public interface OnListFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onListFragmentInteraction(ArrayList<Model_Forecast> item);
-//    }
+    public interface OnListFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onListFragmentInteraction(Model_Zipcode item);
+    }
 
 }

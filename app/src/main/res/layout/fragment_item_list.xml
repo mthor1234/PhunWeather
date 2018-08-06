@@ -10,5 +10,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="async.crash.com.phunweather.Fragments.Fragment_Zipcode"
-    tools:listitem="@layout/fragment_item" />
+    tools:listitem="@layout/fragment_zipcode_item" />
 
