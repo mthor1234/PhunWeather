@@ -12,10 +12,9 @@ import java.util.List;
 import async.crash.com.phunweather.Fragments.Fragment_Detail.OnFragmentInteractionListener;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
-import async.crash.com.phunweather.dummy.DummyContent.DummyItem;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Model_Forecast} and makes a call to the
  * specified {@link OnFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
@@ -36,8 +35,11 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//        View view = LayoutInflater.from(parent.getContext())
+//                .inflate(R.layout.forecast_row_item, parent, false);
+
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.forecast_row_item, parent, false);
+                .inflate(R.layout.cell, parent, false);
 
         tv_maxTemp =  (TextView) view.findViewById(R.id.tv_maxtemp);
         tv_maxTemp =  (TextView) view.findViewById(R.id.tv_mintemp);
@@ -64,7 +66,6 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
 
 
 
-
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,6 +82,7 @@ public class Adapter_RecyclerView_Detail_Item extends RecyclerView.Adapter<Adapt
     public int getItemCount() {
         return mValues.size();
     }
+
 
 //    public void updateAdapter(List<Model_Forecast> test){
 //            System.out.println("MValues clear size: " + test.size());

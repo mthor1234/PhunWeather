@@ -3,17 +3,19 @@ package async.crash.com.phunweather.Fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.ramotion.foldingcell.FoldingCell;
 
 import java.util.ArrayList;
 
-import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Detail_Item;
+import async.crash.com.phunweather.Adapters.Adapter_Unfolding;
 import async.crash.com.phunweather.Interfaces.Interface_Communicate_With_Adapter;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
@@ -46,7 +48,10 @@ implements Interface_Communicate_With_Adapter {
     private String mParam1;
     private String mParam2;
 
-    private RecyclerView.Adapter adapter;
+//    private RecyclerView.Adapter adapter;
+    private Adapter_Unfolding adapter;
+
+    private ListView listView;
 
     private static ArrayList<Model_Forecast> weather_forecast;
 
@@ -96,25 +101,63 @@ implements Interface_Communicate_With_Adapter {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+
+        System.out.println("Weather forecast Size: " + weather_forecast);
+
+        if(weather_forecast.size() > 0) {
+            weather_forecast.get(0).setRequestBtnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity().getApplicationContext(), "CUSTOM HANDLER FOR FIRST BUTTON", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         // Set the adapter
-        if (view instanceof RecyclerView) {
+//        if (view instanceof RecyclerView) {
+        if (view instanceof ListView) {
+            System.out.println("It is an instance of listview");
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+//            RecyclerView recyclerView = (RecyclerView) view;
+            listView = (ListView) view;
+//            if (mColumnCount <= 1) {
+////                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+//            } else {
+//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+//            }
 
-            System.out.println("Preupdate: Size of Forecast: " + weather_forecast.size());
+
+//            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
+            listView.setAdapter(new Adapter_Unfolding(getActivity(), weather_forecast, mListener));
+//            adapter = recyclerView.getAdapter();
 
 
-            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
-            adapter = recyclerView.getAdapter();
+            // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
+            adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
 
+            // add default btn handler for each request btn on each item if custom handler not found
+            adapter.setDefaultRequestBtnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getActivity().getApplicationContext(), "DEFAULT HANDLER FOR ALL BUTTONS", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            listView.setAdapter(adapter);
+
+            // set on click event listener to list view
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
+                    // toggle clicked cell state
+                    ((FoldingCell) view).toggle(false);
+                    // register in adapter that state for selected cell is toggled
+                    adapter.registerToggle(pos);
+                }
+            });
 
         }
 
@@ -142,6 +185,7 @@ implements Interface_Communicate_With_Adapter {
 
     @Override
     public void updateAdapater() {
+//        adapter.notifyDataSetChanged();
         adapter.notifyDataSetChanged();
     }
 

@@ -43,26 +43,12 @@ import async.crash.com.phunweather.R;
 /*
 List of Changes Made Since Last Push
 
-1) Landscape orientation was causing EditText and IME to take up the entire screen.
+1) Added dependency to Ramotion
+    - 'com.ramotion.foldingcell:folding-cell:1.2.2'
 
-        - Fixed it by adding the following to et_zipcode under the toolbar.xml:
-        android:imeOptions="actionDone|flagNoExtractUi" />
+2) Have a rough version of Ramotion working for the Detail Fragment
+    - Needed to switch from RecyclerView to Listview in order to make it work
 
-2) Added GSON Dependency
-
-3) Added saving/persisting data by using SharedPreferences
-    - Methods added: saveData() and loadData()
-    - Convert al_zipcodes to JSON by using GSON library
-    - Recover al_zipcodes from SharedPreferences
-
-4) Got rid of et_zipcode getting focus by default by adding the following to the root layout
-    - android:focusableInTouchMode="true">from et_zipcode in toolbar.xml
-
-5) Added swiping ability to delete zipcodes
-    - Implemented this by using the following tutorial
-      https://www.androidhive.info/2017/09/android-recyclerview-swipe-delete-undo-using-itemtouchhelper/
-
-6) Prevent duplicate zipcode entries with the method: checkDuplicateZipCodeEntry
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -88,8 +74,6 @@ public class Activity_Main extends AppCompatActivity
     private RequestQueue requestQueue;
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
-
-
 
 
 // ------ Fragments ------ //

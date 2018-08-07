@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_weight="2"
+    android:visibility="gone"
+    android:padding="8dp"
+    android:background="#fff">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/rel_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_precipitation_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Percipitation: "
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_alignParentLeft="true"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <TextView
+            android:id="@+id/tv_precipitation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6%"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_precipitation_label"
+            app:layout_constraintTop_toTopOf="@id/tv_precipitation_label"/>
+
+
+
+        <TextView
+            android:id="@+id/tv_humidity_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity: "
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/tv_precipitation_label"
+            app:layout_constraintStart_toStartOf="@id/tv_precipitation_label"/>
+
+        <TextView
+            android:id="@+id/tv_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="26%"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_humidity_label"
+            app:layout_constraintTop_toTopOf="@id/tv_humidity_label"/>
+
+
+        <TextView
+            android:id="@+id/tv_windspeed_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wind Speed: "
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@id/tv_humidity_label"
+            app:layout_constraintStart_toStartOf="@id/tv_humidity_label" />
+
+        <TextView
+            android:id="@+id/tv_windspeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6 MPH"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/tv_windspeed_label"
+            app:layout_constraintTop_toTopOf="@id/tv_windspeed_label"/>
+
+
+
+    <TextView
+        android:id="@+id/tv_sunrise_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sunrise: "
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/tv_precipitation" />
+
+    <TextView
+        android:id="@+id/tv_sunrise"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6:07 am"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="@id/tv_sunrise_label"
+        app:layout_constraintLeft_toRightOf="@id/tv_sunrise_label"/>
+
+
+    <TextView
+        android:id="@+id/tv_sunset_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sunset: "
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toRightOf="@id/tv_precipitation"
+        app:layout_constraintTop_toBottomOf="@id/tv_sunrise_label"/>
+
+    <TextView
+        android:id="@+id/tv_sunset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="7:45 pm"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="@id/tv_sunset_label"
+        app:layout_constraintLeft_toRightOf="@id/tv_sunset_label"/>
+    </android.support.constraint.ConstraintLayout>
+
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="8"
+        android:layout_marginTop="350dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rel_layout">
+
+
+        <LinearLayout
+            android:id="@+id/ll_col_one"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/iv_weathericon_col_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sun_64"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_mintemp_col_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="67F"/>
+
+            <TextView
+                android:id="@+id/tv_maxtemp_col_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="72F"/>
+
+            <TextView
+                android:id="@+id/tv_time_col_one"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="3am"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_col_two"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/iv_weathericon_col_two"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sun_64"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_mintemp_col_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="67F"/>
+
+            <TextView
+                android:id="@+id/tv_maxtemp_col_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="72F"/>
+
+            <TextView
+                android:id="@+id/tv_time_col_two"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="3am"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_col_three"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/iv_weathericon_col_three"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/sun_64"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/tv_mintemp_col_three"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:textAlignment="center"
+            android:text="67F"/>
+
+        <TextView
+            android:id="@+id/tv_maxtemp_col_three"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="72F"/>
+
+        <TextView
+            android:id="@+id/tv_time_col_three"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="3am"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_col_four"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/iv_weathericon_col_four"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sun_64"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_mintemp_col_four"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="67F"/>
+
+            <TextView
+                android:id="@+id/tv_maxtemp_col_four"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="72F"/>
+
+            <TextView
+                android:id="@+id/tv_time_col_four"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="3am"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_col_five"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/iv_weathericon_col_five"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sun_64"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_mintemp_col_five"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="67F"/>
+
+            <TextView
+                android:id="@+id/tv_maxtemp_col_five"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="72F"/>
+
+            <TextView
+                android:id="@+id/tv_time_col_five"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="3am"/>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_col_six"
+            android:layout_columnSpan="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <ImageView
+                android:id="@+id/iv_weathericon_col_six"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/sun_64"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_mintemp_col_six"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:textAlignment="center"
+                android:text="67F"/>
+
+            <TextView
+                android:id="@+id/tv_maxtemp_col_six"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="72F"/>
+
+            <TextView
+                android:id="@+id/tv_time_col_six"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:text="3am"/>
+
+        </LinearLayout>
+
+
+
+    </GridLayout>
+
+
+</android.support.constraint.ConstraintLayout>

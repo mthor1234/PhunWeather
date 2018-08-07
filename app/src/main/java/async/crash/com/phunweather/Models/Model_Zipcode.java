@@ -11,6 +11,8 @@ public class Model_Zipcode {
     private String state;
     private String id;
 
+
+
 // ------------- Constructors ------------------ //
 
     //  Default Constructor //
@@ -63,6 +65,7 @@ public class Model_Zipcode {
     }
 
     // ------------- Getters / Setters End  ----------- //
+
 
 }
 

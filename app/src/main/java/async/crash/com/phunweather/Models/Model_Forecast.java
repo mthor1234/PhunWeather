@@ -1,5 +1,7 @@
 package async.crash.com.phunweather.Models;
 
+import android.view.View;
+
 import java.util.ArrayList;
 
 /**
@@ -65,6 +67,7 @@ public class Model_Forecast {
     private ArrayList<String> times = new ArrayList<String>();
     private ArrayList<Integer> weatherIcons = new ArrayList<Integer>();
 
+    private View.OnClickListener requestBtnClickListener;
 
 
 
@@ -298,4 +301,12 @@ public class Model_Forecast {
 //        }
 //        return currMaxTemp;
 //    }
+
+    public View.OnClickListener getRequestBtnClickListener() {
+        return requestBtnClickListener;
+    }
+
+    public void setRequestBtnClickListener(View.OnClickListener requestBtnClickListener) {
+        this.requestBtnClickListener = requestBtnClickListener;
+    }
 }
