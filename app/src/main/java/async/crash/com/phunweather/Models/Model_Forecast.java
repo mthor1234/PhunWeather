@@ -54,25 +54,36 @@ import java.util.ArrayList;
 
 public class Model_Forecast {
 
+// ------ ints ------ //
     private int currentTemp, humidity, windSpeed;
+    private int drawableID;
+
+
+    // ------ Strings ------ //
     private String description, date;
 
+// ------ ints ------ //
     private int maxTemp = -99;
     private int minTemp = 99;
 
+
+// ------ ArrayLists ------ //
     private ArrayList<Integer> minTemps = new ArrayList<Integer>();
     private ArrayList<Integer> maxTemps = new ArrayList<Integer>();
     private ArrayList<Integer> humidities = new ArrayList<Integer>();
     private ArrayList<Integer> windSpeeds = new ArrayList<Integer>();
-    private ArrayList<String> times = new ArrayList<String>();
     private ArrayList<Integer> weatherIcons = new ArrayList<Integer>();
+    private ArrayList<CharSequence> sunrises = new ArrayList<CharSequence>();
+    private ArrayList<CharSequence> sunsets = new ArrayList<CharSequence>();
 
+
+    private ArrayList<Long> times = new ArrayList<Long>();
+    private ArrayList<String> weather_Descriptions = new ArrayList<String>();
+
+
+// ------ Click Listeners ------ //
     private View.OnClickListener requestBtnClickListener;
 
-
-
-    //    private Drawable weatherIcon;
-    private int drawableID;
 
     public Model_Forecast(int currentTemp, int minTemp, int maxTemp, int humidity, int windSpeed, String description, String date, int drawableID) {
         this.currentTemp = currentTemp;
@@ -96,7 +107,7 @@ public class Model_Forecast {
         this.drawableID = drawableID;
     }
 
-    public Model_Forecast(ArrayList<Integer> minTemps, ArrayList<Integer> maxTemps, ArrayList<Integer> humidities, ArrayList<Integer> windSpeeds, ArrayList<String> times, int drawableID) {
+    public Model_Forecast(ArrayList<Integer> minTemps, ArrayList<Integer> maxTemps, ArrayList<Integer> humidities, ArrayList<Integer> windSpeeds, ArrayList<Long> times, int drawableID, ArrayList<String> weather_Descriptions) {
         this.minTemps = minTemps;
         this.maxTemps = maxTemps;
         this.humidities = humidities;
@@ -104,9 +115,7 @@ public class Model_Forecast {
         this.times = times;
         this.drawableID = drawableID;
 
-//        this.minTemp = calculateMinTemp();
-//        this.maxTemp = calculateMaxTemp();
-
+        this.weather_Descriptions = weather_Descriptions;
     }
 
     public Model_Forecast() {
@@ -114,117 +123,6 @@ public class Model_Forecast {
 //        this.maxTemp = calculateMaxTemp();
     }
 
-    public int getCurrentTemp() {
-        return currentTemp;
-    }
-
-    public void setCurrentTemp(int currentTemp) {
-        this.currentTemp = currentTemp;
-    }
-
-    public int getMinTemp() {
-        return minTemp;
-    }
-
-    public void setMinTemp(int minTemp) {
-        this.minTemp = minTemp;
-    }
-
-    public int getMaxTemp() {
-        return maxTemp;
-    }
-
-    public void setMaxTemp(int maxTemp) {
-        this.maxTemp = maxTemp;
-    }
-
-    public int getHumidity() {
-        return humidity;
-    }
-
-    public void setHumidity(int humidity) {
-        this.humidity = humidity;
-    }
-
-    public int getWindSpeed() {
-        return windSpeed;
-    }
-
-    public void setWindSpeed(int windSpeed) {
-        this.windSpeed = windSpeed;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-//    public Bitmap getWeatherIcon() {
-//        return weatherIcon;
-//    }
-//
-//    public void setWeatherIcon(Bitmap weatherIcon) {
-//        this.weatherIcon = weatherIcon;
-//    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public int getDrawableID() {
-        return drawableID;
-    }
-
-    public void setDrawableID(int drawableID) {
-        this.drawableID = drawableID;
-    }
-
-    public ArrayList<Integer> getMinTemps() {
-        return minTemps;
-    }
-
-    public void setMinTemps(ArrayList<Integer> minTemps) {
-        this.minTemps = minTemps;
-    }
-
-    public ArrayList<Integer> getMaxTemps() {
-        return maxTemps;
-    }
-
-    public void setMaxTemps(ArrayList<Integer> maxTemps) {
-        this.maxTemps = maxTemps;
-    }
-
-    public ArrayList<Integer> getHumidities() {
-        return humidities;
-    }
-
-    public void setHumidities(ArrayList<Integer> humidities) {
-        this.humidities = humidities;
-    }
-
-    public ArrayList<Integer> getWindSpeeds() {
-        return windSpeeds;
-    }
-
-    public void setWindSpeeds(ArrayList<Integer> windSpeeds) {
-        this.windSpeeds = windSpeeds;
-    }
-
-    public ArrayList<String> getTimes() {
-        return times;
-    }
-
-    public void setTimes(ArrayList<String> times) {
-        this.times = times;
-    }
 
     public void addMinTemp(int minTemp){
         minTemps.add(minTemp);
@@ -251,8 +149,20 @@ public class Model_Forecast {
         windSpeeds.add(windSpeed);
     }
 
-    public void addTime(String time){
+    public void addTime(long time){
         times.add(time);
+    }
+
+    public void addWeatherDescription(String description){
+        weather_Descriptions.add(description);
+    }
+
+    public void addSunrise(CharSequence sunrise){
+        sunrises.add(sunrise);
+    }
+
+    public void addSunset(CharSequence sunset){
+        sunsets.add(sunset);
     }
 
     public void print(){
@@ -276,6 +186,38 @@ public class Model_Forecast {
         currentTemp = temp;
     }
 
+    public void calculateAverageHumidity(){
+        if(humidities.size() > 0){
+            int humidities_aggregate = 0;
+
+            for(int humidity: humidities) {
+                humidities_aggregate += humidity;
+            }
+
+            // Take average of humidities
+            setHumidity(humidities_aggregate / humidities.size());
+        }else{
+            setHumidity(0);
+        }
+
+    }
+
+    public void calculateAverageWind(){
+        if(windSpeeds.size() > 0){
+            int windspeed_aggregate = 0;
+
+            for(int windspeed: windSpeeds) {
+                windspeed_aggregate += windspeed;
+            }
+
+            // Take average of humidities
+            setWindSpeed(windspeed_aggregate / windSpeeds.size());
+        }else{
+            setWindSpeed(0);
+        }
+
+    }
+
     public void addWeatherIconPath(int id){weatherIcons.add(id);}
 
 
@@ -285,7 +227,7 @@ public class Model_Forecast {
 //        for(int id: weatherIcons){
 //
 //        }
-        if(weatherIcons.size() > 0) {
+        if(weatherIcons.size() >= 0) {
             drawableID = weatherIcons.get(0);
         }
 
@@ -308,5 +250,138 @@ public class Model_Forecast {
 
     public void setRequestBtnClickListener(View.OnClickListener requestBtnClickListener) {
         this.requestBtnClickListener = requestBtnClickListener;
+    }
+
+
+    // ------ Getters ------ //
+
+    public int getCurrentTemp() {
+        return currentTemp;
+    }
+
+    public int getMinTemp() {
+        return minTemp;
+    }
+
+    public int getMaxTemp() {
+        return maxTemp;
+    }
+
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public int getWindSpeed() {
+        return windSpeed;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public int getDrawableID() {
+        return drawableID;
+    }
+
+    public ArrayList<Integer> getMinTemps() {
+        return minTemps;
+    }
+
+    public ArrayList<Integer> getMaxTemps() {
+        return maxTemps;
+    }
+
+    public ArrayList<Integer> getHumidities() {
+        return humidities;
+    }
+
+    public ArrayList<Integer> getWindSpeeds() {
+        return windSpeeds;
+    }
+
+    public ArrayList<Long> getTimes() {
+        return times;
+    }
+
+    public ArrayList<CharSequence> getSunrises() {
+        return sunrises;
+    }
+
+    public ArrayList<CharSequence> getSunsets() {
+        return sunsets;
+    }
+
+    public ArrayList<String> getWeather_Descriptions() {
+        return weather_Descriptions;
+    }
+
+    // ------ Setters ------ //
+
+    public void setCurrentTemp(int currentTemp) {
+        this.currentTemp = currentTemp;
+    }
+
+    public void setMinTemp(int minTemp) {
+        this.minTemp = minTemp;
+    }
+
+    public void setMaxTemp(int maxTemp) {
+        this.maxTemp = maxTemp;
+    }
+
+    public void setHumidity(int humidity) {
+        this.humidity = humidity;
+    }
+
+    public void setWindSpeed(int windSpeed) {
+        this.windSpeed = windSpeed;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setDrawableID(int drawableID) {
+        this.drawableID = drawableID;
+    }
+
+    public void setMinTemps(ArrayList<Integer> minTemps) {
+        this.minTemps = minTemps;
+    }
+
+    public void setMaxTemps(ArrayList<Integer> maxTemps) {
+        this.maxTemps = maxTemps;
+    }
+
+    public void setHumidities(ArrayList<Integer> humidities) {
+        this.humidities = humidities;
+    }
+
+    public void setWindSpeeds(ArrayList<Integer> windSpeeds) {
+        this.windSpeeds = windSpeeds;
+    }
+
+    public void setTimes(ArrayList<Long> times) {
+        this.times = times;
+    }
+
+    public void setSunrise(ArrayList<CharSequence> sunrise) {
+        this.sunrises = sunrise;
+    }
+
+    public void setSunset(ArrayList<CharSequence> sunset) {
+        this.sunsets = sunset;
+    }
+
+    public void setWeather_Descriptions(ArrayList<String> weather_Descriptions) {
+        this.weather_Descriptions = weather_Descriptions;
     }
 }

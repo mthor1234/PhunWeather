@@ -56,7 +56,6 @@
             android:layout_below="@id/tv_mintemp"
             android:layout_marginLeft="10dp"
             android:layout_alignLeft="@id/tv_mintemp"
-            android:layout_alignRight="@id/tv_maxtemp"
             android:textAlignment="center"/>
 
 

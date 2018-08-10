@@ -2,7 +2,10 @@ package async.crash.com.phunweather.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -43,11 +46,15 @@ import async.crash.com.phunweather.R;
 /*
 List of Changes Made Since Last Push
 
-1) Added dependency to Ramotion
-    - 'com.ramotion.foldingcell:folding-cell:1.2.2'
+1) JSON retrieval of current forecast
+    - Now displaying on the listview as the first item
 
-2) Have a rough version of Ramotion working for the Detail Fragment
-    - Needed to switch from RecyclerView to Listview in order to make it work
+2) URL builder for the Five Day Forecast and Current Forecast API calls
+
+3) Titlebar now displays proper text when moving between Zip_Code and Detail Fragments
+
+4) Model_WeatherForecast
+    - Switched from a single weather description to an ArrayList containing weather descriptions for every three hour increment
 
  */
 
@@ -58,16 +65,6 @@ public class Activity_Main extends AppCompatActivity
     private static final String TAG = Activity_Main.class.getSimpleName();
     private static final String BASE_OPENWEATHERMAP_URL = "https://samples.openweathermap.org/data/2.5/forecast/daily?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
     private static final String OPENWEATHERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
-
- // By Zip
- //   https://api.openweathermap.org/data/2.5/forecast?zip=06084,us&appid=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial
-
-
-//    private static final String BASE_OPENWEATHERMAP_URL2 = "https://api.openweathermap.org/data/2.5/forecast?id=524901&APPID="+OPENWEATHERMAP_API_KEY+"";
-
-
- //  http://api.openweathermap.org/data/2.5/forecast/daily?id=524901&APPID=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial
-
 
 // ------ Volley ------ //
     private JsonArrayRequest request;
@@ -94,7 +91,6 @@ public class Activity_Main extends AppCompatActivity
     private EditText et_enterZip;
 
 
-
 // ------ Adapters ------ //
     // Creating fragment_detail_adapter for Detail
     private Adapter_RecyclerView_Detail_Item fragment_detail_adapter;
@@ -102,8 +98,18 @@ public class Activity_Main extends AppCompatActivity
 
 
     private ProgressDialog pDialog;
+
+
+// ------ ArrayLists ------ //
     private ArrayList<Model_Forecast> models;
     private ArrayList<Model_Zipcode> al_zipCodes;
+
+// ------ Strings ------ //
+    private String unit_type = "imperial";  // Used if user wants imperial or metric readings
+    private String selected_zipCode;
+
+    private Toolbar toolbar;
+
 
 
     @Override
@@ -112,7 +118,6 @@ public class Activity_Main extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-        // TODO: GETTING ERRORS TRYING TO RETAIN THIS FRAGMENT FIX THIS IN THE MORNING!!!!!!
 //        if(savedInstanceState != null){
 //            //Restore the fragment's instance
 //            System.out.println("Saved Instance State");
@@ -130,9 +135,6 @@ public class Activity_Main extends AppCompatActivity
 //                fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
 //            }
 
-
-
-
         loadData();
 
         //--------- Fragment ---------- //
@@ -142,17 +144,21 @@ public class Activity_Main extends AppCompatActivity
 
         models = new ArrayList<Model_Forecast>();
 
+
             // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
             set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
 
             //--------- Setting Views ---------- //
 
             // ToolBar & removing toolbar title
-            Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+            toolbar = (Toolbar) findViewById(R.id.tool_bar);
             toolbar.setTitle("");
             setSupportActionBar(toolbar);
 
             et_enterZip = (EditText) findViewById(R.id.et_zipcode);
+            et_enterZip.setHint("Enter Zip Code");
+            et_enterZip.setEnabled(true);
+
             imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
 
 
@@ -165,10 +171,11 @@ public class Activity_Main extends AppCompatActivity
             // Replace the Fragment
             fm.beginTransaction()
                     .replace(R.id.fragment_container, fragment_zip)
-                    .addToBackStack("fragment_container")
-                    .commit();
+               .commit();
 
             //--------- End of Fragment ---------- //
+
+
 
 
         //--------- Click Listeners ---------- //
@@ -215,21 +222,38 @@ public class Activity_Main extends AppCompatActivity
         hideKeyboard(this);
 
 
-        JSONParser jsonParser = new JSONParser(this, "06084");
-        jsonParser.fiveDayForecast();
+        if(checkInternetConnection()) {
 
-        Bundle bundle = new Bundle();
+            // Clear out models so it is starting fresh when the fivedayforecast is generated.
+            // Also prevents different zipcode forecasts from being added.
+            // Should look into caching / saving data
+            models.clear();
 
-        FragmentManager fm = getSupportFragmentManager();
-        fragment_detail = Fragment_Detail.newInstance(models);
+            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
 
-        set_Fragment_Detail_Listener((Interface_Communicate_With_Adapter) fragment_detail);
+            // Testing out singledayforecast()
+
+            // Return get the forecast and add it to models
+            models.add(jsonParser.singleDayForecast());
+            models.addAll(jsonParser.fiveDayForecast());
+
+            Bundle bundle = new Bundle();
+
+            FragmentManager fm = getSupportFragmentManager();
+            fragment_detail = Fragment_Detail.newInstance(models);
+
+            set_Fragment_Detail_Listener((Interface_Communicate_With_Adapter) fragment_detail);
 
 
-        fm.beginTransaction()
-                .replace(R.id.fragment_container, fragment_detail)
-                .addToBackStack(null)
-                .commit();
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment_detail)
+                    .addToBackStack(null)
+                    .commit();
+            selected_zipCode = item.getZipcode();
+            et_enterZip.setHint(selected_zipCode + " Forecast");
+
+            et_enterZip.setEnabled(false);
+        }
 
     }
 
@@ -375,10 +399,39 @@ public class Activity_Main extends AppCompatActivity
         Type type = new TypeToken<ArrayList<Model_Zipcode>>(){}.getType();
         al_zipCodes = gson.fromJson(json, type);
 
-        if (al_zipCodes == null){
+        if (al_zipCodes == null) {
             al_zipCodes = new ArrayList<Model_Zipcode>();
         }
-
-
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        System.out.println("onBackPressed!");
+                if(fragment_detail.isVisible()){
+                    et_enterZip.setHint(selected_zipCode + " Forecast");
+                    et_enterZip.setEnabled(true);
+                }else if(fragment_zip.isVisible()){
+                    et_enterZip.setHint("Enter Zip Code");
+                    et_enterZip.setEnabled(true);
+                }
+            }
+
+    public boolean checkInternetConnection(){
+        ConnectivityManager cm =
+                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        if(!isConnected){
+            Snackbar.make(this.findViewById(R.id.fragment_container), "Not Connected to the Internet!", Snackbar.LENGTH_LONG);
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 }

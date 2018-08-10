@@ -8,12 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.ramotion.foldingcell.FoldingCell;
-
 import java.util.HashSet;
 import java.util.List;
-
 import async.crash.com.phunweather.Fragments.Fragment_Detail;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
@@ -47,14 +44,36 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             cell = (FoldingCell) vi.inflate(R.layout.cell, parent, false);
             // binding view parts to view holder
 
-
+// ------------- Settings Folded Views --------------- //
             viewHolder.tv_maxTemp =  (TextView) cell.findViewById(R.id.tv_maxtemp);
             viewHolder.tv_minTemp =  (TextView) cell.findViewById(R.id.tv_mintemp);
             viewHolder.tv_currentTemp =  (TextView) cell.findViewById(R.id.tv_currenttemp);
+            viewHolder.tv_humidity =  (TextView) cell.findViewById(R.id.tv_humidity);
 //        tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
             viewHolder.tv_date =  (TextView) cell.findViewById(R.id.tv_date);
             viewHolder.tv_weatherDescription = (TextView) cell.findViewById(R.id.tv_weather_description);
+            viewHolder.tv_windSpeed = (TextView) cell.findViewById(R.id.tv_windspeed);
+            viewHolder.tv_sunRise = (TextView) cell.findViewById(R.id.tv_sunrise);
+            viewHolder.tv_sunSet = (TextView) cell.findViewById(R.id.tv_sunset);
+
             viewHolder.iv_weatherIcon = (ImageView) cell.findViewById(R.id.forecast_iv_thumbnail);
+
+
+
+// ------------- Settings Unfolded Views --------------- //
+            viewHolder.tv_maxTemp_unfolded =  (TextView) cell.findViewById(R.id.tv_maxtemp_unfolded);
+            viewHolder.tv_minTemp_unfolded =  (TextView) cell.findViewById(R.id.tv_mintemp_unfolded);
+            viewHolder.tv_currentTemp_unfolded=  (TextView) cell.findViewById(R.id.tv_currenttemp_unfolded);
+            viewHolder.tv_humidity =  (TextView) cell.findViewById(R.id.tv_humidity);
+            viewHolder.tv_weatherDescription_unfolded =  (TextView) cell.findViewById(R.id.tv_weather_description_unfolded);
+//        tv_dayOfWeek =  (TextView) view.findViewById(R.id.tv_dayofweek);
+            viewHolder.tv_date_unfolded =  (TextView) cell.findViewById(R.id.tv_date_unfolded);
+            viewHolder.tv_weatherDescription_unfolded = (TextView) cell.findViewById(R.id.tv_weather_description_unfolded);
+            viewHolder.tv_windSpeed = (TextView) cell.findViewById(R.id.tv_windspeed);
+            viewHolder.tv_sunRise = (TextView) cell.findViewById(R.id.tv_sunrise);
+            viewHolder.tv_sunSet = (TextView) cell.findViewById(R.id.tv_sunset);
+
+            viewHolder.iv_weatherIcon_unfolded = (ImageView) cell.findViewById(R.id.forecast_iv_thumbnail_unfolded);
 
             cell.setTag(viewHolder);
 
@@ -72,19 +91,24 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
         if (null == item)
             return cell;
 
-        // bind data from selected element to view through view holder
-//        viewHolder.tv_maxTemp.setText(item.getPrice());
-//        viewHolder.tv_date.setText(item.getFromAddress());
-//        viewHolder.tv_weatherDescription.setText(item.getToAddress());
-//        viewHolder.iv_weatherIcon.setText(String.valueOf(item.getRequestsCount()));
-//        viewHolder.tv_minTemp.setText(item.getPledgePrice());
 
+        // Folded Views
         viewHolder.tv_date.setText(item.getDate());
-        viewHolder.tv_maxTemp.setText(Double.toString(item.getMaxTemp()) + "F");
-        viewHolder.tv_minTemp.setText(Double.toString(item.getMinTemp()) + "F");
-        viewHolder.tv_currentTemp.setText(Double.toString(item.getCurrentTemp()) + "F");
-        viewHolder.tv_weatherDescription.setText(item.getDescription());
+        viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp()) + "F");
+        viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp()) + "F");
+        viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp()) + "F");
         viewHolder.iv_weatherIcon.setImageResource(item.getDrawableID());
+
+
+
+        // Unfolded Views
+        viewHolder.tv_date_unfolded.setText(item.getDate());
+        viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp()) + "F");
+        viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp()) + "F");
+        viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp()) + "F");
+        viewHolder.tv_windSpeed.setText(Integer.toString(item.getWindSpeed()) + "MPH" );
+        viewHolder.tv_humidity.setText(Integer.toString(item.getHumidity()) + "%" );
+        viewHolder.iv_weatherIcon_unfolded.setImageResource(item.getDrawableID());
 
         // set custom btn handler for list item from that item
         if (item.getRequestBtnClickListener() != null) {
@@ -93,6 +117,31 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             // (optionally) add "default" handler if no handler found in item
             viewHolder.tv_currentTemp.setOnClickListener(defaultRequestBtnClickListener);
         }
+
+        if(item.getWeather_Descriptions().size() > 0){
+            viewHolder.tv_weatherDescription.setText(item.getWeather_Descriptions().get(0));
+            viewHolder.tv_weatherDescription_unfolded.setText(item.getWeather_Descriptions().get(0));
+        }else{
+            viewHolder.tv_weatherDescription.setText("Dummy Content");
+            viewHolder.tv_weatherDescription_unfolded.setText("Dummy Content");
+
+        }
+
+        // Getting sunrises and sunsets
+        if(item.getSunrises().size() > 0) {
+            viewHolder.tv_sunRise.setText( item.getSunrises().get(position));
+        }
+        else{
+            viewHolder.tv_sunRise.setText("12345");
+        }
+
+        if(item.getSunsets().size() > 0) {
+            viewHolder.tv_sunSet.setText( item.getSunsets().get(position));
+        }
+        else{
+            viewHolder.tv_sunSet.setText("12345");
+        }
+
 
         return cell;
     }
@@ -128,7 +177,19 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
         TextView tv_minTemp;
         TextView tv_date;
         TextView tv_weatherDescription;
+        TextView tv_windSpeed;
+        TextView tv_humidity;
+        TextView tv_sunRise;
+        TextView tv_sunSet;
         ImageView iv_weatherIcon;
+
+        TextView tv_maxTemp_unfolded;
+        TextView tv_currentTemp_unfolded;
+        TextView tv_minTemp_unfolded;
+        TextView tv_date_unfolded;
+        TextView tv_weatherDescription_unfolded;
+        ImageView iv_weatherIcon_unfolded;
+
 
     }
 }
