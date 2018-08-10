@@ -46,16 +46,7 @@ import async.crash.com.phunweather.R;
 /*
 List of Changes Made Since Last Push
 
-1) JSON retrieval of current forecast
-    - Now displaying on the listview as the first item
-
-2) URL builder for the Five Day Forecast and Current Forecast API calls
-
-3) Titlebar now displays proper text when moving between Zip_Code and Detail Fragments
-
-4) Model_WeatherForecast
-    - Switched from a single weather description to an ArrayList containing weather descriptions for every three hour increment
-
+1)
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -229,14 +220,6 @@ public class Activity_Main extends AppCompatActivity
             // Should look into caching / saving data
             models.clear();
 
-            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
-
-            // Testing out singledayforecast()
-
-            // Return get the forecast and add it to models
-            models.add(jsonParser.singleDayForecast());
-            models.addAll(jsonParser.fiveDayForecast());
-
             Bundle bundle = new Bundle();
 
             FragmentManager fm = getSupportFragmentManager();
@@ -244,11 +227,24 @@ public class Activity_Main extends AppCompatActivity
 
             set_Fragment_Detail_Listener((Interface_Communicate_With_Adapter) fragment_detail);
 
-
             fm.beginTransaction()
                     .replace(R.id.fragment_container, fragment_detail)
                     .addToBackStack(null)
                     .commit();
+
+            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
+
+            // Testing out singledayforecast()
+
+            // Return get the forecast and add it to models
+//            models.add(jsonParser.singleDayForecast());
+//            models.addAll(jsonParser.fiveDayForecast());
+
+            models.add(jsonParser.getSingle_day_forecast());
+            models.addAll(jsonParser.getFive_day_forecast());
+
+
+
             selected_zipCode = item.getZipcode();
             et_enterZip.setHint(selected_zipCode + " Forecast");
 

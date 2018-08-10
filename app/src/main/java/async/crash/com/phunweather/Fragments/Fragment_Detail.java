@@ -118,22 +118,8 @@ implements Interface_Communicate_With_Adapter {
         // Set the adapter
 //        if (view instanceof RecyclerView) {
         if (view instanceof ListView) {
-            System.out.println("It is an instance of listview");
             Context context = view.getContext();
-//            RecyclerView recyclerView = (RecyclerView) view;
             listView = (ListView) view;
-//            if (mColumnCount <= 1) {
-////                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
-//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-//            }
-
-
-//            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
-            listView.setAdapter(new Adapter_Unfolding(getActivity(), weather_forecast, mListener));
-//            adapter = recyclerView.getAdapter();
-
 
             // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
             adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
@@ -185,8 +171,10 @@ implements Interface_Communicate_With_Adapter {
 
     @Override
     public void updateAdapater() {
+        if(adapter != null) {
 //        adapter.notifyDataSetChanged();
-        adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();
+        }
     }
 
     // Overrides from Interface_Communicate_With_Adapater
