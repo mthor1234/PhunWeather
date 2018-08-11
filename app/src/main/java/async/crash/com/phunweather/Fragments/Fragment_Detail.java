@@ -1,7 +1,10 @@
 package async.crash.com.phunweather.Fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -11,14 +14,19 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ramotion.foldingcell.FoldingCell;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import async.crash.com.phunweather.Adapters.Adapter_Unfolding;
 import async.crash.com.phunweather.Interfaces.Interface_Communicate_With_Adapter;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A fragment representing a list of Items.
@@ -65,19 +73,17 @@ implements Interface_Communicate_With_Adapter {
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static Fragment_Detail newInstance(int columnCount) {
-        Fragment_Detail fragment = new Fragment_Detail();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static Fragment_Detail newInstance(int columnCount) {
+//        Fragment_Detail fragment = new Fragment_Detail();
+//        Bundle args = new Bundle();
+//        args.putInt(ARG_COLUMN_COUNT, columnCount);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
     public static Fragment_Detail newInstance(ArrayList<Model_Forecast> forecast) {
         Fragment_Detail fragment = new Fragment_Detail();
         Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
 
         weather_forecast = forecast;
 
@@ -89,12 +95,9 @@ implements Interface_Communicate_With_Adapter {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println("Fragment_Detail OnCreate!");
+
         Toolbar toolbar= (Toolbar) getActivity().findViewById(R.id.tool_bar);
-
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
     }
 
 
@@ -104,7 +107,7 @@ implements Interface_Communicate_With_Adapter {
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
 
-        System.out.println("Weather forecast Size: " + weather_forecast);
+        System.out.println("OnCreateView");
 
         if(weather_forecast.size() > 0) {
             weather_forecast.get(0).setRequestBtnClickListener(new View.OnClickListener() {
@@ -118,22 +121,10 @@ implements Interface_Communicate_With_Adapter {
         // Set the adapter
 //        if (view instanceof RecyclerView) {
         if (view instanceof ListView) {
-            System.out.println("It is an instance of listview");
+
+            System.out.println("Setting the Adapter!!!!");
             Context context = view.getContext();
-//            RecyclerView recyclerView = (RecyclerView) view;
             listView = (ListView) view;
-//            if (mColumnCount <= 1) {
-////                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-//            } else {
-//                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-//            }
-
-
-//            recyclerView.setAdapter(new Adapter_RecyclerView_Detail_Item(weather_forecast, mListener));
-            listView.setAdapter(new Adapter_Unfolding(getActivity(), weather_forecast, mListener));
-//            adapter = recyclerView.getAdapter();
-
 
             // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
             adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
@@ -164,7 +155,24 @@ implements Interface_Communicate_With_Adapter {
         return view;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
+        System.out.println("Fragment_Detail: OnActivityCreated!");
+
+        for(Model_Forecast item: weather_forecast){
+            System.out.println("FRAGMENT_DETAIL: " + item.getDate());
+        }
+
+//        if(weather_forecast == null) {
+//            loadData();
+//        }
+
+        if(savedInstanceState != null) {
+//            loadData();
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -184,12 +192,156 @@ implements Interface_Communicate_With_Adapter {
     }
 
     @Override
-    public void updateAdapater() {
-//        adapter.notifyDataSetChanged();
-        adapter.notifyDataSetChanged();
+    public void updateAdapter() {
+        if(adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+//        saveData();
+    }
     // Overrides from Interface_Communicate_With_Adapater
+
+
+    // Save data to shared preferences
+    //  1) GrabShared Preferences Obj
+    //  2) Create Gson Object
+    //  3) Save arraylist of zipcodes as JSON by using GSON
+    private void saveData(){
+
+        System.out.println("Saving Detail Data");
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+
+//        for(Model_Forecast item: weather_forecast){
+
+//            editor.putString("current temp", gson.toJson(item.getCurrentTemp()));
+//            editor.putString("date", gson.toJson(item.getDate()));
+//            editor.putString("description", gson.toJson(item.getDescription()));
+//            editor.putString("min temp", gson.toJson(item.getMinTemp()));
+//            editor.putString("max temp", gson.toJson(item.getMaxTemp()));
+//            editor.putString("humidity", gson.toJson(item.getHumidity()));
+
+
+//        public int getCurrentTemp() {
+//                return currentTemp;
+//            }
+//
+//            public int getMinTemp() {
+//                return minTemp;
+//            }
+//
+//            public int getMaxTemp() {
+//                return maxTemp;
+//            }
+//
+//            public int getHumidity() {
+//                return humidity;
+//            }
+//
+//            public int getWindSpeed() {
+//                return windSpeed;
+//            }
+//
+//            public String getDescription() {
+//                return description;
+//            }
+//
+//            public String getDate() {
+//                return date;
+//            }
+//
+//            public int getDrawableID() {
+//                return drawableID;
+//            }
+//
+//            public ArrayList<Integer> getMinTemps() {
+//                return minTemps;
+//            }
+//
+//            public ArrayList<Integer> getMaxTemps() {
+//                return maxTemps;
+//            }
+//
+//            public ArrayList<Integer> getHumidities() {
+//                return humidities;
+//            }
+//
+//            public ArrayList<Integer> getWindSpeeds() {
+//                return windSpeeds;
+//            }
+//
+//            public ArrayList<Long> getTimes() {
+//                return times;
+//            }
+//
+//            public ArrayList<CharSequence> getSunrises() {
+//                return sunrises;
+//            }
+//
+//            public ArrayList<CharSequence> getSunsets() {
+//                return sunsets;
+//            }
+//
+//            public ArrayList<String> getWeather_Descriptions() {
+//                return weather_Descriptions;
+//            }
+//
+//            public ArrayList<Integer> getWeatherIcons() {
+//                return weatherIcons;
+//            }
+
+
+
+//            editor.apply();
+        }
+
+
+
+
+//        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(weather_forecast);
+//        editor.putString("weather forecast", json);
+//        editor.apply();
+
+    // Recover data from SharedPreferences
+    private void loadData(){
+
+        System.out.println("Loading Detail Data");
+
+
+        for(Model_Forecast item: weather_forecast){
+            System.out.println("FRAGMENT_DETAIL: " + item.getDate());
+        }
+
+
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("weather forecast", null);
+        Type type = new TypeToken<ArrayList<Model_Forecast>>(){}.getType();
+        weather_forecast = gson.fromJson(json, type);
+
+//        updateAdapter();
+
+        System.out.println("Weather Forecast Info: " + weather_forecast);
+
+
+        if (weather_forecast == null) {
+            System.out.println("Weather Forecast is null!!!!: ");
+            weather_forecast = new ArrayList<Model_Forecast>();
+        }
+        adapter.notifyDataSetChanged();
+
+    }
 
 
 
@@ -212,6 +364,5 @@ implements Interface_Communicate_With_Adapter {
     public interface OnFragmentInteractionListener {
         void onListFragmentInteraction(Model_Forecast item);
     }
-
 
 }

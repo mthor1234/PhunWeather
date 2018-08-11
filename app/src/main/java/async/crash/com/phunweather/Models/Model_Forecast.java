@@ -319,6 +319,10 @@ public class Model_Forecast {
         return weather_Descriptions;
     }
 
+    public ArrayList<Integer> getWeatherIcons() {
+        return weatherIcons;
+    }
+
     // ------ Setters ------ //
 
     public void setCurrentTemp(int currentTemp) {
