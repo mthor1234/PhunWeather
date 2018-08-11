@@ -153,9 +153,7 @@ public class Activity_Main extends AppCompatActivity
         if (savedInstanceState == null) {
             System.out.println("Saved Instance State = null");
             currentFragment = FRAGMENT_ZIPCODE;
-
-//            al_zipCodes = new ArrayList<Model_Zipcode>();
-
+            
             loadData();
 
 
@@ -177,41 +175,6 @@ public class Activity_Main extends AppCompatActivity
             currentFragment = savedInstanceState.getInt("currentFragment");
             System.out.println(currentFragment);
 
-//            switch (currentFragment) {
-//                case FRAGMENT_ZIPCODE:
-//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
-//
-//                    //--------- Fragment ---------- //
-//                    fm.beginTransaction()
-//                        .replace(R.id.fragment_container,  fragment_zip)
-//                        .commit();
-//                    loadData();
-//                    break;
-//
-//                case FRAGMENT_DETAIL:
-//                    System.out.println("CASE: Fragment Detail!!");
-//
-//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
-//
-//                    fragment_detail = fm.getFragment(savedInstanceState, "Fragment_Detail");
-//
-//                    fm.beginTransaction()
-//                            .replace(R.id.fragment_container,  fragment_detail)
-//                            .addToBackStack("Detail Fragment")
-//                            .commit();
-//
-//                    // Used setting the correct Fragment on screen rotation
-//                    currentFragment = FRAGMENT_DETAIL;
-//
-//                    loadData();
-//
-//
-//                    // Called to properly handle the Edit_Text
-//                    et_enterZip.setHint(selected_zipCode + " Forecast");
-//                    et_enterZip.setEnabled(false);
-//
-//                    break;
-//            }
             fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
             loadData();
 
@@ -241,8 +204,6 @@ public class Activity_Main extends AppCompatActivity
                                 .commit();
 
                         // Used setting the correct Fragment on screen rotation
-//                        loadData();
-
 
                         // Called to properly handle the Edit_Text
                         et_enterZip.setHint(selected_zipCode + " Forecast");
@@ -275,12 +236,10 @@ public class Activity_Main extends AppCompatActivity
         switch_units.setTextOff("C");
 
 
-
         //--------- End Setting Views ---------- //
 
         // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
         set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
-
 
 
     }
