@@ -10,7 +10,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -39,7 +38,6 @@ public class Fragment_Zipcode extends Fragment
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
-    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
     private static ArrayList<Model_Zipcode> al_zipCodes;
@@ -64,7 +62,6 @@ public class Fragment_Zipcode extends Fragment
         al_zipCodes = items;
 
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, 1);
         fragment.setArguments(args);
 
         return fragment;
@@ -82,10 +79,6 @@ public class Fragment_Zipcode extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
 
     }
 
@@ -118,20 +111,34 @@ public class Fragment_Zipcode extends Fragment
             new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
 
-            if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
                 recyclerView.setItemAnimator(new DefaultItemAnimator());
                 recyclerView.addItemDecoration(new DividerItemDecoration(context, DividerItemDecoration.VERTICAL));
                 recyclerView.setAdapter(adapter);
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
+
 
             recyclerView.setAdapter(new Adapter_RecyclerView_Zipcode(context, al_zipCodes, mListener));
         }
 
 
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnListFragmentInteractionListener) {
+            mListener = (OnListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
 
@@ -158,7 +165,7 @@ public class Fragment_Zipcode extends Fragment
             // remove the item from recycler view
 //            adapter.removeItem(viewHolder.getAdapterPosition());
             al_zipCodes.remove(position);
-            updateAdapater();
+            updateAdapter();
 
 
             // showing snack bar with Undo option
@@ -171,7 +178,7 @@ public class Fragment_Zipcode extends Fragment
                     // undo is selected, restore the deleted item
 //                    adapter.restoreItem(deletedItem, deletedIndex);
                     al_zipCodes.add(deletedIndex, deletedItem);
-                    updateAdapater();
+                    updateAdapter();
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -181,25 +188,9 @@ public class Fragment_Zipcode extends Fragment
 
 
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void updateAdapater() {
+    public void updateAdapter() {
         recyclerView.getAdapter().notifyDataSetChanged();
     }
 

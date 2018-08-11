@@ -1,6 +1,8 @@
 package async.crash.com.phunweather.Networking;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -42,8 +44,6 @@ public class JSONParser {
 
     private static final String TAG = JSONParser.class.getSimpleName();
 
-    private static String OPENWEATHERMAP_CURRENT_API_URL; // = "https://api.openweathermap.org/data/2.5/weather?zip=06084,us&appid=ae1d2194a7816e11b58f5e4fcc19f195&units=imperial";
-    private static String OPENWEATHERMAP_FORCEAST_API_URL;  //"https://api.openweathermap.org/data/2.5/forecast?zip="+zipcode+",us&appid="+api+"&units="+units;
 
     private static final String OPENWEATERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
 
@@ -78,10 +78,15 @@ public class JSONParser {
         Cache.Entry entry_fiveday_forecast = cache.get(openWeatherMap_FiveDayForecast_URL);
         Cache.Entry entry_single_forecast = cache.get(openWeatherMap_CurrentForecast_URL);
 
+        // There is cached data
+        if (entry_single_forecast != null) {
 
-        if(entry_single_forecast != null){
+            // Check the internet connection to alert the user that data may be old if not connected
+            // Will still set data if there is cached data
+            checkInternetConnection();
+
             try {
-                String data = new String(entry_single_forecast.data ,"UTF-8");
+                String data = new String(entry_single_forecast.data, "UTF-8");
                 System.out.println("Entry is not Null! Getting cached singleDayForecast: " + data);
 
                 Gson gson = new Gson();
@@ -95,12 +100,21 @@ public class JSONParser {
             }
 
         } else {
-            singleDayForecast();
+            // Internet connection is required if there is no cached data
+            if (checkInternetConnection()) {
+                singleDayForecast();
+            }
         }
 
-        if(entry_fiveday_forecast != null){
+        // There is cached data
+        if (entry_fiveday_forecast != null) {
+
             try {
-                String data = new String(entry_fiveday_forecast.data ,"UTF-8");
+                // Check the internet connection to alert the user that data may be old if not connected
+                // Will still set data if there is cached data
+                checkInternetConnection();
+
+                String data = new String(entry_fiveday_forecast.data, "UTF-8");
                 System.out.println("Entry is not Null! Getting cached FiveDayForecast: " + data);
 
                 parseFiveDayForecast(new JSONObject(data));
@@ -113,10 +127,12 @@ public class JSONParser {
 
         } else {
             System.out.println("Entry is Null! Making Five Day Forecast API Call: ");
+            // Internet connection is required if there is no cached data
+            if (checkInternetConnection()) {
+                fiveDayForecast();
+            }
 
-            fiveDayForecast();
         }
-
     }
 
     /*
@@ -154,7 +170,6 @@ public class JSONParser {
 
     // Holds all of the weeks forecasts.
     // Each Model_Forecast = a daily five_day_forecast
-//    private ArrayList<Model_Forecast> models;
 
 
     /*
@@ -347,53 +362,6 @@ public class JSONParser {
 
                 parseSingleDayForecast(response);
 
-//              /*  try {
-//
-//                    JSONArray weather_array = response.getJSONArray("weather");
-//                    JSONObject mainObj = response.getJSONObject("main");
-//                    JSONObject windObj = response.getJSONObject("wind");
-//                    JSONObject sysObj = response.getJSONObject("sys");
-//
-//                    Double minTemp = mainObj.getDouble("temp_min");
-//                    Double maxTemp = mainObj.getDouble("temp_max");
-//
-//
-//                    int weatherID = weather_array.getJSONObject(0).getInt("id");
-//                    String main_weather_description = weather_array.getJSONObject(0).getString("main");
-//
-//                    String previousDate = "";
-//
-//                    CharSequence timeStampDate = formatTimeStamp(response.getLong("dt") * 1000);
-//
-//
-//                    String date = updateddateFormat.format(new Date());
-//
-//                    single_day_forecast.setCurrentTemp((int) Math.round(mainObj.getDouble("temp")));
-//                    single_day_forecast.addMinTemp((int) Math.round(minTemp));
-//                    single_day_forecast.addMaxTemp((int) Math.round(maxTemp));
-//                    single_day_forecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-//                    single_day_forecast.addWindSpeed((int) windObj.getDouble("speed"));
-//                    single_day_forecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherID));
-//                    single_day_forecast.addWeatherDescription(main_weather_description);
-//                    single_day_forecast.setDate(date);
-//
-//                    single_day_forecast.addSunrise(formatTimeStamp(sysObj.getLong("sunrise")*1000));
-//                    single_day_forecast.addSunset(formatTimeStamp(sysObj.getLong("sunset")*1000));
-//
-//
-//                    single_day_forecast.calculateWeatherIcon();
-//                    single_day_forecast.calculateAverageHumidity();
-//                    single_day_forecast.calculateAverageWind();
-//
-//                    } catch (JSONException e1) {
-//                    e1.printStackTrace();
-//                }
-//                    // Updates adapter via Activity -> Fragment communication
-//                    // Utilizes an interface
-//
-//                    // Hides the process dialog, letting the user know that the background operation is over
-//                    activity_main.hidePDialog();*/
-
             }
 
         }, new Response.ErrorListener() {
@@ -567,7 +535,7 @@ public class JSONParser {
 
             // Updates adapter via Activity -> Fragment communication
             // Utilizes an interface
-            activity_main.updateFragment_DetailAdapater();
+//            activity_main.updateFragment_DetailAdapater();
 
             // Hides the process dialog, letting the user know that the background operation is over
             activity_main.hidePDialog();
@@ -631,6 +599,7 @@ public class JSONParser {
         // Hides the process dialog, letting the user know that the background operation is over
         activity_main.hidePDialog();
     }
+
 
 
         /********************** Description: *****************************
@@ -712,6 +681,30 @@ public class JSONParser {
 
         return relTime;
     }
+
+
+
+    // Checks if currently connected to the internet
+    //  - False: Show a snackbar alerting the user that they should connect to the internet
+    public boolean checkInternetConnection(){
+        ConnectivityManager cm =
+                (ConnectivityManager)activity_main.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+        // If no connection
+        if(!isConnected){
+            Snackbar.make(activity_main.findViewById(R.id.fragment_container), "Not Connected to the Internet! Data May Not Be Up-To-Date", Snackbar.LENGTH_LONG).show();
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+
+// ------------ Getters -------------- //
 
     public ArrayList<Model_Forecast> getFive_day_forecast() {
         return five_day_forecast;

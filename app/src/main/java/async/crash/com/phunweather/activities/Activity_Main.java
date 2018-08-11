@@ -2,10 +2,7 @@ package async.crash.com.phunweather.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -44,9 +41,21 @@ import async.crash.com.phunweather.R;
 
 
 /*
-List of Changes Made Since Last Push
+Summary: Moved checking internet connection from Activity_Main to JSONParser to keep network operations in JSONParser
 
-1)
+    1) Class: Activity_Main:
+        - Moved checkInternetConnection() to JSONParser
+
+    2) Class: JSONParser:
+        - Added checkInternetConection()
+            * Checks if connected before performing networking operations / caching
+            * If(cache is available)
+                * Simply retrieve the cached data and display a message
+                * that data may not be up-to-date
+              }
+            * Else{
+                * Display to the user that internet connection is required
+            * }
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -57,7 +66,14 @@ public class Activity_Main extends AppCompatActivity
     private static final String BASE_OPENWEATHERMAP_URL = "https://samples.openweathermap.org/data/2.5/forecast/daily?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
     private static final String OPENWEATHERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
 
-// ------ Volley ------ //
+    public static final int FRAGMENT_ZIPCODE = 0;
+    public static final int FRAGMENT_DETAIL = 1;
+
+    private int currentFragment;
+
+
+
+    // ------ Volley ------ //
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     private RequestQueue mRequestQueue;
@@ -68,7 +84,6 @@ public class Activity_Main extends AppCompatActivity
     private Fragment fragment_detail;
     private Fragment fragment_zip;
     private Fragment mContent; // Keeps Instance State
-
 
 
 // ------ Interfaces ------ //
@@ -87,12 +102,11 @@ public class Activity_Main extends AppCompatActivity
     private Adapter_RecyclerView_Detail_Item fragment_detail_adapter;
     private Adapter_RecyclerView_Zipcode fragment_zipcode_adapter;
 
-
     private ProgressDialog pDialog;
 
 
 // ------ ArrayLists ------ //
-    private ArrayList<Model_Forecast> models;
+    private ArrayList<Model_Forecast> models = new ArrayList<Model_Forecast>();
     private ArrayList<Model_Zipcode> al_zipCodes;
 
 // ------ Strings ------ //
@@ -109,65 +123,18 @@ public class Activity_Main extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-//        if(savedInstanceState != null){
-//            //Restore the fragment's instance
-//            System.out.println("Saved Instance State");
-//            fragment_zip = getSupportFragmentManager().getFragment(savedInstanceState, "Fragment_Zipcode");
-//            al_zipCodes = Fragment_Zipcode.getAl_zipCodes();
-//        }
-//        else{
-//            System.out.println("Not Saved Instance State");
-//
-//            models = new ArrayList<Model_Forecast>();
-//            al_zipCodes = new ArrayList<Model_Zipcode>();
-//
-//            //--------- Fragment ---------- //
-//                // Create the Zipcode Fragment & Fragment Manager
-//                fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
-//            }
+        FragmentManager fm = getSupportFragmentManager();
 
-        loadData();
+        //--------- Setting Views ---------- //
 
-        //--------- Fragment ---------- //
-        // Create the Zipcode Fragment & Fragment Manager
-        fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
+        // ToolBar & removing toolbar title
+        toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
 
-
-        models = new ArrayList<Model_Forecast>();
-
-
-            // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
-            set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
-
-            //--------- Setting Views ---------- //
-
-            // ToolBar & removing toolbar title
-            toolbar = (Toolbar) findViewById(R.id.tool_bar);
-            toolbar.setTitle("");
-            setSupportActionBar(toolbar);
-
-            et_enterZip = (EditText) findViewById(R.id.et_zipcode);
-            et_enterZip.setHint("Enter Zip Code");
-            et_enterZip.setEnabled(true);
-
-            imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
-
-
-            //--------- End Setting Views ---------- //
-
-
-
-            FragmentManager fm = getSupportFragmentManager();
-
-            // Replace the Fragment
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container, fragment_zip)
-               .commit();
-
-            //--------- End of Fragment ---------- //
-
-
-
+        et_enterZip = (EditText) findViewById(R.id.et_zipcode);
+        et_enterZip.setHint("Enter Zip Code");
+        et_enterZip.setEnabled(true);
 
         //--------- Click Listeners ---------- //
 
@@ -175,11 +142,13 @@ public class Activity_Main extends AppCompatActivity
         // 1) If the EditText is five digits in length
         //      True: Add it to the arraylist -> recyclerview / adapter
         //      False: Show a Snackbar that the entry needs to be 5 digits in length
+
         et_enterZip.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    System.out.println("DONE BUTTON CLICKED");
 
                     addZipCode();
 
@@ -188,7 +157,140 @@ public class Activity_Main extends AppCompatActivity
                 return handled;
             }
         });
+
+
+        //other stuff
+        if (savedInstanceState == null) {
+            System.out.println("Saved Instance State = null");
+            currentFragment = FRAGMENT_ZIPCODE;
+
+//            al_zipCodes = new ArrayList<Model_Zipcode>();
+
+            loadData();
+
+
+            // Create the Zipcode Fragment & Fragment Manager
+            fragment_zip = Fragment_Zipcode.newInstance(al_zipCodes);
+
+            //--------- End of Fragment ---------- //
+
+
+            // Replace the Fragment
+            fm.beginTransaction()
+                    .replace(R.id.fragment_container, fragment_zip)
+                    .commit();
+
+
+
+        } else {
+            System.out.println("Saved Instance State != null");
+            currentFragment = savedInstanceState.getInt("currentFragment");
+            System.out.println(currentFragment);
+
+//            switch (currentFragment) {
+//                case FRAGMENT_ZIPCODE:
+//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
+//
+//                    //--------- Fragment ---------- //
+//                    fm.beginTransaction()
+//                        .replace(R.id.fragment_container,  fragment_zip)
+//                        .commit();
+//                    loadData();
+//                    break;
+//
+//                case FRAGMENT_DETAIL:
+//                    System.out.println("CASE: Fragment Detail!!");
+//
+//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
+//
+//                    fragment_detail = fm.getFragment(savedInstanceState, "Fragment_Detail");
+//
+//                    fm.beginTransaction()
+//                            .replace(R.id.fragment_container,  fragment_detail)
+//                            .addToBackStack("Detail Fragment")
+//                            .commit();
+//
+//                    // Used setting the correct Fragment on screen rotation
+//                    currentFragment = FRAGMENT_DETAIL;
+//
+//                    loadData();
+//
+//
+//                    // Called to properly handle the Edit_Text
+//                    et_enterZip.setHint(selected_zipCode + " Forecast");
+//                    et_enterZip.setEnabled(false);
+//
+//                    break;
+//            }
+            fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
+            loadData();
+
+
+            //--------- Fragment ---------- //
+
+            System.out.println("CASE: Fragment Detail!!");
+
+
+            if(currentFragment == FRAGMENT_DETAIL){
+
+//                        fragment_detail = fm.getFragment(savedInstanceState, "Fragment_Detail");
+
+
+                // Using parsing cache to update the fragment_detail information
+                JSONParser parser = new JSONParser(this, selected_zipCode, "imperial");
+                models.add(parser.getSingle_day_forecast());
+                models.addAll(parser.getFive_day_forecast());
+
+                fragment_detail = new Fragment_Detail().newInstance(models);
+
+                fm.popBackStack();
+
+                        fm.beginTransaction()
+                                .replace(R.id.fragment_container,  fragment_detail)
+                                .addToBackStack("Detail Fragment")
+                                .commit();
+
+                        // Used setting the correct Fragment on screen rotation
+//                        loadData();
+
+
+                        // Called to properly handle the Edit_Text
+                        et_enterZip.setHint(selected_zipCode + " Forecast");
+                        et_enterZip.setEnabled(false);
+
+                }
+                else{
+
+                fm.popBackStack();
+
+                fm.beginTransaction()
+                        .replace(R.id.fragment_container,  fragment_zip)
+                        .commit();
+
+                // Called to properly handle the Edit_Text
+                et_enterZip.setHint("Enter Zip Code");
+                et_enterZip.setEnabled(true);
+
+
+            }
+        }
+
+        models = new ArrayList<Model_Forecast>();
+
+
+        imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
+
+
+        //--------- End Setting Views ---------- //
+
+        // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
+        set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
+
+
+
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,52 +306,54 @@ public class Activity_Main extends AppCompatActivity
 
 
     // Implements from Fragment_Zipcode
+    // TODO: Not loading on first click
     @Override
         public void onListFragmentInteraction(Model_Zipcode item) {
             Log.v(TAG, "onListFragmentInteraction");
 
 
-        // Hide the softkeyboard
-        hideKeyboard(this);
+            // Hide the softkeyboard
+            hideKeyboard(this);
 
-
-        if(checkInternetConnection()) {
 
             // Clear out models so it is starting fresh when the fivedayforecast is generated.
             // Also prevents different zipcode forecasts from being added.
             // Should look into caching / saving data
             models.clear();
 
-            Bundle bundle = new Bundle();
+            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
+
+
+            // Return get the forecast and add it to models
+            models.add(jsonParser.getSingle_day_forecast());
+            models.addAll(jsonParser.getFive_day_forecast());
 
             FragmentManager fm = getSupportFragmentManager();
             fragment_detail = Fragment_Detail.newInstance(models);
 
-            set_Fragment_Detail_Listener((Interface_Communicate_With_Adapter) fragment_detail);
 
-            fm.beginTransaction()
-                    .replace(R.id.fragment_container, fragment_detail)
-                    .addToBackStack(null)
-                    .commit();
+        set_Fragment_Detail_Listener((Interface_Communicate_With_Adapter) fragment_detail);
 
-            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
+        fm.popBackStack();
 
-            // Testing out singledayforecast()
+        fm.beginTransaction()
+                .replace(R.id.fragment_container, fragment_detail)
+                .addToBackStack("Detail Fragment")
+                .commit();
 
-            // Return get the forecast and add it to models
-//            models.add(jsonParser.singleDayForecast());
-//            models.addAll(jsonParser.fiveDayForecast());
 
-            models.add(jsonParser.getSingle_day_forecast());
-            models.addAll(jsonParser.getFive_day_forecast());
+        updateFragment_DetailAdapater();
 
+
+        // Used setting the correct Fragment on screen rotation
+            currentFragment = FRAGMENT_DETAIL;
 
 
             selected_zipCode = item.getZipcode();
             et_enterZip.setHint(selected_zipCode + " Forecast");
 
             et_enterZip.setEnabled(false);
-        }
+       // }
 
     }
 
@@ -265,12 +369,12 @@ public class Activity_Main extends AppCompatActivity
 
     public void updateFragment_DetailAdapater(){
         // Updates the fragment_detail_adapter
-        listener_Detail_Fragment.updateAdapater();
+        listener_Detail_Fragment.updateAdapter();
     }
 
     public void updateFragment_ZipcodeAdapater(){
         // Updates the fragment_detail_adapter
-        listener_Zipcode_Fragment.updateAdapater();
+        listener_Zipcode_Fragment.updateAdapter();
     }
 
     public void addToFiveDayForecast(Model_Forecast forecast){
@@ -325,6 +429,8 @@ public class Activity_Main extends AppCompatActivity
                 Snackbar.make(this.findViewById(R.id.fragment_container), "Zipcode: " + enteredZipcode + " Has Been Added!", Snackbar.LENGTH_SHORT).show();
                 et_enterZip.setText("");
 
+                System.out.println("Adding to al_zipcodes: " + al_zipCodes.size());
+
                 al_zipCodes.add(new Model_Zipcode(enteredZipcode.toString()));
                 // Updates the adapter so the newly created Model_Zipcode is added and displayed on the Recyclerview
                 updateFragment_ZipcodeAdapater();
@@ -366,12 +472,29 @@ public class Activity_Main extends AppCompatActivity
     // TODO: Need to save the currently attached fragment or possibly both fragments?????
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        System.out.println("Activity Saving Instance State");
+
+        outState.putInt("currentFragment", currentFragment);
+
         super.onSaveInstanceState(outState);
 
         saveData();
 
         //Save the fragment's instance
         getSupportFragmentManager().putFragment(outState, "Fragment_Zipcode", fragment_zip);
+
+
+
+// Causes Error when when first creating
+//        Fragment_Detail tempFragment = (Fragment_Detail) getSupportFragmentManager().findFragmentByTag("Fragment Detail");
+//
+//        if(fragment_detail != null){
+//
+//            System.out.println("Putting fragment detail into outstate");
+//            getSupportFragmentManager().putFragment(outState, "Fragment_Detail", fragment_detail);
+//        }
+
+
     }
 
     // Save data to shared preferences
@@ -383,21 +506,25 @@ public class Activity_Main extends AppCompatActivity
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(al_zipCodes);
-        editor.putString("task list", json);
+        editor.putString("zipcodes", json);
+        editor.putString("selected zipcode", selected_zipCode);
         editor.apply();
+
     }
 
     // Recover data from SharedPreferences
     private void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = sharedPreferences.getString("task list", null);
+        String json = sharedPreferences.getString("zipcodes", null);
         Type type = new TypeToken<ArrayList<Model_Zipcode>>(){}.getType();
         al_zipCodes = gson.fromJson(json, type);
+        selected_zipCode = sharedPreferences.getString("selected zipcode", null);
 
         if (al_zipCodes == null) {
             al_zipCodes = new ArrayList<Model_Zipcode>();
         }
+
     }
 
     @Override
@@ -405,29 +532,17 @@ public class Activity_Main extends AppCompatActivity
         super.onBackPressed();
 
         System.out.println("onBackPressed!");
-                if(fragment_detail.isVisible()){
-                    et_enterZip.setHint(selected_zipCode + " Forecast");
-                    et_enterZip.setEnabled(true);
-                }else if(fragment_zip.isVisible()){
-                    et_enterZip.setHint("Enter Zip Code");
-                    et_enterZip.setEnabled(true);
-                }
+
+        if (fragment_detail != null) {
+            if (fragment_detail.isVisible()) {
+                et_enterZip.setHint(selected_zipCode + " Forecast");
+                et_enterZip.setEnabled(false);
+                currentFragment = FRAGMENT_DETAIL;
+            } else if (fragment_zip.isVisible()) {
+                et_enterZip.setHint("Enter Zip Code");
+                et_enterZip.setEnabled(true);
+                currentFragment = FRAGMENT_ZIPCODE;
             }
-
-    public boolean checkInternetConnection(){
-        ConnectivityManager cm =
-                (ConnectivityManager)this.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-
-        if(!isConnected){
-            Snackbar.make(this.findViewById(R.id.fragment_container), "Not Connected to the Internet!", Snackbar.LENGTH_LONG);
-            return false;
-        }else{
-            return true;
         }
     }
-
 }

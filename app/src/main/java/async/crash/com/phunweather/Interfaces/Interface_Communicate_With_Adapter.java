@@ -5,5 +5,5 @@ package async.crash.com.phunweather.Interfaces;
  */
 
 public interface Interface_Communicate_With_Adapter {
-    void updateAdapater();
+    void updateAdapter();
 }
