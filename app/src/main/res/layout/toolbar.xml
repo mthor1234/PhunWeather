@@ -10,13 +10,23 @@
         android:layout_height="wrap_content"
         android:focusableInTouchMode="true">
 
-        <ImageButton
+        <!--<ImageButton-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_centerVertical="true"-->
+        <!--android:id="@+id/action_settings"-->
+        <!--android:title="@string/action_settings" />-->
+
+        <Switch
+            android:id="@+id/switch_units"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-        android:id="@+id/action_settings"
-        android:title="@string/action_settings" />
+            android:showText="true"
+            android:text=""
+            android:title="@string/action_settings" />
 
         <EditText
         android:id="@+id/et_zipcode"

@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -43,19 +43,9 @@ import async.crash.com.phunweather.R;
 /*
 Summary: Moved checking internet connection from Activity_Main to JSONParser to keep network operations in JSONParser
 
-    1) Class: Activity_Main:
-        - Moved checkInternetConnection() to JSONParser
+    1)
 
-    2) Class: JSONParser:
-        - Added checkInternetConection()
-            * Checks if connected before performing networking operations / caching
-            * If(cache is available)
-                * Simply retrieve the cached data and display a message
-                * that data may not be up-to-date
-              }
-            * Else{
-                * Display to the user that internet connection is required
-            * }
+
  */
 
 public class Activity_Main extends AppCompatActivity
@@ -93,7 +83,7 @@ public class Activity_Main extends AppCompatActivity
 
 
 // ------ Views ------ //
-    private ImageButton imgBtn_settings;
+    private Switch switch_units;
     private EditText et_enterZip;
 
 
@@ -278,7 +268,12 @@ public class Activity_Main extends AppCompatActivity
         models = new ArrayList<Model_Forecast>();
 
 
-        imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
+        // Setting Switch
+        switch_units = (Switch) findViewById(R.id.switch_units);
+        switch_units.setChecked(true);
+        switch_units.setTextOn("F");
+        switch_units.setTextOff("C");
+
 
 
         //--------- End Setting Views ---------- //
@@ -301,8 +296,14 @@ public class Activity_Main extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        if(item.getItemId() == R.id.switch_units){
+            System.out.println("Switched Units Clicked!");
+            switch_units.toggle();
+        }
+
         return super.onOptionsItemSelected(item);
     }
+
 
 
     // Implements from Fragment_Zipcode
