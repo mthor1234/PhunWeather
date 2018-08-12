@@ -63,14 +63,17 @@ public class Model_Forecast {
     private String description, date;
 
 // ------ ints ------ //
-    private int maxTemp = -99;
-    private int minTemp = 99;
+    private int maxTempI = -99;
+    private int maxTempC = -99;
+
+    private int minTempF = 99;
+    private int minTempC = 99;
 
 
 // ------ ArrayLists ------ //
-    private ArrayList<Integer> minTemps = new ArrayList<Integer>();
-    private ArrayList<Integer> maxTemps = new ArrayList<Integer>();
-    private ArrayList<Integer> humidities = new ArrayList<Integer>();
+    private ArrayList<Integer> minTempsF = new ArrayList<Integer>();
+    private ArrayList<Integer> maxTempsF = new ArrayList<Integer>();
+    private ArrayList<Integer> humiditiesF = new ArrayList<Integer>();
     private ArrayList<Integer> windSpeeds = new ArrayList<Integer>();
     private ArrayList<Integer> weatherIcons = new ArrayList<Integer>();
     private ArrayList<CharSequence> sunrises = new ArrayList<CharSequence>();
@@ -219,6 +222,7 @@ public class Model_Forecast {
     }
 
     public void addWeatherIconPath(int id){weatherIcons.add(id);}
+    
 
 
     // TODO: Create a method to generate the most common icon
@@ -232,8 +236,7 @@ public class Model_Forecast {
         }
 
     }
-//
-//
+
 //    public int calculateMaxTemp(){
 //
 //        for(int maxTemp: maxTemps){

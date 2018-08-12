@@ -186,9 +186,6 @@ public class Fragment_Zipcode extends Fragment
         }
     }
 
-
-
-
     @Override
     public void updateAdapter() {
         recyclerView.getAdapter().notifyDataSetChanged();

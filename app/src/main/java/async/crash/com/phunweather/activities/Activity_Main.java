@@ -16,8 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -41,26 +42,25 @@ import async.crash.com.phunweather.R;
 
 
 /*
-Summary: Moved checking internet connection from Activity_Main to JSONParser to keep network operations in JSONParser
+Summary: Added a switch within the toolbar to handle if the user would like units displayed in Celsius or Fahrenheit
 
-    1) Class: Activity_Main:
-        - Moved checkInternetConnection() to JSONParser
+    1) Added switch to toolbar.xml
 
-    2) Class: JSONParser:
-        - Added checkInternetConection()
-            * Checks if connected before performing networking operations / caching
-            * If(cache is available)
-                * Simply retrieve the cached data and display a message
-                * that data may not be up-to-date
-              }
-            * Else{
-                * Display to the user that internet connection is required
-            * }
+    2) Activity_Main
+        - Set view
+        - Created boolean to hold weather checked or not
+        - OnCheckedChangeListener
+        - JSONParser now takes a boolean which equates to:
+            * true: imperial
+            * false: metric
+    3)
  */
 
 public class Activity_Main extends AppCompatActivity
         implements Fragment_Zipcode.OnListFragmentInteractionListener,
                     Fragment_Detail.OnFragmentInteractionListener{
+
+// ------ Static ------ //
 
     private static final String TAG = Activity_Main.class.getSimpleName();
     private static final String BASE_OPENWEATHERMAP_URL = "https://samples.openweathermap.org/data/2.5/forecast/daily?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
@@ -69,11 +69,8 @@ public class Activity_Main extends AppCompatActivity
     public static final int FRAGMENT_ZIPCODE = 0;
     public static final int FRAGMENT_DETAIL = 1;
 
-    private int currentFragment;
 
-
-
-    // ------ Volley ------ //
+// ------ Volley ------ //
     private JsonArrayRequest request;
     private RequestQueue requestQueue;
     private RequestQueue mRequestQueue;
@@ -93,7 +90,7 @@ public class Activity_Main extends AppCompatActivity
 
 
 // ------ Views ------ //
-    private ImageButton imgBtn_settings;
+    private Switch switch_units;
     private EditText et_enterZip;
 
 
@@ -109,9 +106,24 @@ public class Activity_Main extends AppCompatActivity
     private ArrayList<Model_Forecast> models = new ArrayList<Model_Forecast>();
     private ArrayList<Model_Zipcode> al_zipCodes;
 
+
+// ------ int ------ //
+    private int currentFragment;
+
+
 // ------ Strings ------ //
     private String unit_type = "imperial";  // Used if user wants imperial or metric readings
     private String selected_zipCode;
+
+// ------ boolean ------ //
+
+    /* Holds what unit type the user wants:
+         false: "metric"
+         true: "imperial"
+     imperial by default   */
+
+    private boolean unitType = true;
+
 
     private Toolbar toolbar;
 
@@ -187,41 +199,6 @@ public class Activity_Main extends AppCompatActivity
             currentFragment = savedInstanceState.getInt("currentFragment");
             System.out.println(currentFragment);
 
-//            switch (currentFragment) {
-//                case FRAGMENT_ZIPCODE:
-//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
-//
-//                    //--------- Fragment ---------- //
-//                    fm.beginTransaction()
-//                        .replace(R.id.fragment_container,  fragment_zip)
-//                        .commit();
-//                    loadData();
-//                    break;
-//
-//                case FRAGMENT_DETAIL:
-//                    System.out.println("CASE: Fragment Detail!!");
-//
-//                    fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
-//
-//                    fragment_detail = fm.getFragment(savedInstanceState, "Fragment_Detail");
-//
-//                    fm.beginTransaction()
-//                            .replace(R.id.fragment_container,  fragment_detail)
-//                            .addToBackStack("Detail Fragment")
-//                            .commit();
-//
-//                    // Used setting the correct Fragment on screen rotation
-//                    currentFragment = FRAGMENT_DETAIL;
-//
-//                    loadData();
-//
-//
-//                    // Called to properly handle the Edit_Text
-//                    et_enterZip.setHint(selected_zipCode + " Forecast");
-//                    et_enterZip.setEnabled(false);
-//
-//                    break;
-//            }
             fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
             loadData();
 
@@ -237,7 +214,8 @@ public class Activity_Main extends AppCompatActivity
 
 
                 // Using parsing cache to update the fragment_detail information
-                JSONParser parser = new JSONParser(this, selected_zipCode, "imperial");
+//                JSONParser parser = new JSONParser(this, selected_zipCode, "imperial");
+                JSONParser parser = new JSONParser(this, selected_zipCode, unitType);
                 models.add(parser.getSingle_day_forecast());
                 models.addAll(parser.getFive_day_forecast());
 
@@ -274,22 +252,40 @@ public class Activity_Main extends AppCompatActivity
 
             }
         }
-
         models = new ArrayList<Model_Forecast>();
 
 
-        imgBtn_settings = (ImageButton) findViewById(R.id.action_settings);
+        //--------- Switch ---------- //
+        switch_units = (Switch) findViewById(R.id.switch_units);
+        switch_units.setTextOff("C");
+        switch_units.setTextOn("F");
+        switch_units.setChecked(true);
 
 
-        //--------- End Setting Views ---------- //
+    //--------- End Setting Views ---------- //
 
         // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
         set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
 
+        switch_units.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                System.out.println("On Options Item Selected");
+//                System.out.println("switch units matching!");
+//
+//                switch_units.toggle();
+
+                if(isChecked){
+                    System.out.println("Switch is checked!");
+
+                }else{
+                    System.out.println("Switch is not checked!");
+                }
+            }
+        });
 
 
     }
-
 
 
     @Override
@@ -300,6 +296,7 @@ public class Activity_Main extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -321,7 +318,8 @@ public class Activity_Main extends AppCompatActivity
             // Should look into caching / saving data
             models.clear();
 
-            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
+//            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), "imperial");
+            JSONParser jsonParser = new JSONParser(this, item.getZipcode(), unitType);
 
 
             // Return get the forecast and add it to models

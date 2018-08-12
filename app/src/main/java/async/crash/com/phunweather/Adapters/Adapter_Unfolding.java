@@ -94,18 +94,18 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
 
         // Folded Views
         viewHolder.tv_date.setText(item.getDate());
-        viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp()) + "F");
-        viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp()) + "F");
-        viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp()) + "F");
+        viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp()) + "°");
+        viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp()) + "°");
+        viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp()) + "°");
         viewHolder.iv_weatherIcon.setImageResource(item.getDrawableID());
 
 
 
         // Unfolded Views
         viewHolder.tv_date_unfolded.setText(item.getDate());
-        viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp()) + "F");
-        viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp()) + "F");
-        viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp()) + "F");
+        viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp()) + "°");
+        viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp()) + "°");
+        viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp()) + "°");
         viewHolder.tv_windSpeed.setText(Integer.toString(item.getWindSpeed()) + "MPH" );
         viewHolder.tv_humidity.setText(Integer.toString(item.getHumidity()) + "%" );
         viewHolder.iv_weatherIcon_unfolded.setImageResource(item.getDrawableID());

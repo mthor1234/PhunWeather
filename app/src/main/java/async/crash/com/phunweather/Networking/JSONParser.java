@@ -44,7 +44,6 @@ public class JSONParser {
 
     private static final String TAG = JSONParser.class.getSimpleName();
 
-
     private static final String OPENWEATERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
 
     private String zipcode, unit_type;
@@ -62,10 +61,16 @@ public class JSONParser {
     private Model_Forecast single_day_forecast = new Model_Forecast();
 
 
-    public JSONParser(final Activity_Main activity_main, String zipcode, String unit_type) {
+    public JSONParser(final Activity_Main activity_main, String zipcode, boolean unit_type) {
         this.zipcode = zipcode;
         this.activity_main = activity_main;
-        this.unit_type = unit_type;
+
+        if(unit_type == false){
+            this.unit_type = "metric";
+        }else{
+            this.unit_type = "imperial";
+        }
+//        this.unit_type = unit_type;
 
         // Generate URI / URL safe encodings to call the API's
         openWeatherMap_FiveDayForecast_URL = uriBuilder_fiveDayForecast();
@@ -447,8 +452,6 @@ public class JSONParser {
 
         try {
 
-            System.out.println("Got that five day forecast response!");
-
             JSONArray list = response.getJSONArray("list");
             Log.d("TAG", "JSONObj list=" + list);
             Log.d("TAG", "JSONObj length=" + list.length());
@@ -467,60 +470,70 @@ public class JSONParser {
                 // Format date
                 date = formatDate(date);
 
-                // New Day
-                if(!previousDate.matches(date)){
+                // TODO: Sometimes get duplicate entries. Added this if statement which I believe is on the right track but getting an error for i = 7 calculateweathericon() sometimes
+                // Added this to prevent single day duplicate of today's forecast
+//                if (!date.matches(single_day_forecast.getDate())) {
+//                    System.out.println(date + " Date does not match!");
 
-                    if(i != 0) {
-                        // 1. Create a Model_Forecast object (This is a weather five_day_forecast)
-                        // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
+                    // New Day
+                    if (!previousDate.matches(date)) {
 
-                        System.out.println("i: " + i + " Previous Date: " + previousDate + " date: " + date +  "Adding the previous forecast_model");
+                        if (i != 0) {
+                            // 1. Create a Model_Forecast object (This is a weather five_day_forecast)
+                            // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
 
-                        tempForecast.calculateAverageTemp();
-                        tempForecast.calculateWeatherIcon();
-                        tempForecast.calculateAverageHumidity();
-                        tempForecast.calculateAverageWind();
+                            System.out.println("i: " + i + " Previous Date: " + previousDate + " date: " + date + "Adding the previous forecast_model");
+
+                            tempForecast.calculateAverageTemp();
+                            tempForecast.calculateWeatherIcon();
+                            tempForecast.calculateAverageHumidity();
+                            tempForecast.calculateAverageWind();
 
 //                        activity_main.getModels().add(single_day_forecast);
-                        five_day_forecast.add(tempForecast);
+                            five_day_forecast.add(tempForecast);
+
+                        }
+                        tempForecast = new Model_Forecast();
+
+                        String main_weather_description = weatherArray.getJSONObject(0).getString("main");
+
+                        tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                        tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                        tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                        tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                        tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
+                        tempForecast.setDate(date);
+                        tempForecast.addWeatherDescription(main_weather_description);
+
+                        previousDate = date;
+
+                        int weatherID = weatherArray.getJSONObject(0).getInt("id");
+
+                        int weatherIcon_DrawableID = getWeatherIconDrawablePath(activity_main, weatherID);
 
                     }
-                    tempForecast = new Model_Forecast();
 
-                    String main_weather_description = weatherArray.getJSONObject(0).getString("main");
+                    // Same date, add values to ArrayList
+                    else {
+                        System.out.println("i: " + i + " Adding to old Forecast " + tempForecast.getDate());
 
-                    tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
-                    tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
-                    tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-                    tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                    tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main,weatherArray.getJSONObject(0).getInt("id")));
-                    tempForecast.setDate(date);
-                    tempForecast.addWeatherDescription(main_weather_description);
+                        String main_weather_description = weatherArray.getJSONObject(0).getString("main");
 
-                    previousDate = date;
+                        tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                        tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                        tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                        tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                        tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
+                        tempForecast.addWeatherDescription(main_weather_description);
 
-                    int weatherID = weatherArray.getJSONObject(0).getInt("id");
-
-                    int weatherIcon_DrawableID = getWeatherIconDrawablePath(activity_main, weatherID);
+                    }
 
                 }
-
-                // Same date, add values to ArrayList
-                else{
-                    System.out.println("i: " + i + " Adding to old Forecast " + tempForecast.getDate());
-
-                    String main_weather_description = weatherArray.getJSONObject(0).getString("main");
-
-                    tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
-                    tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
-                    tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-                    tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                    tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
-                    tempForecast.addWeatherDescription(main_weather_description);
-
-                }
-
-            }
+//                else{
+//                    System.out.println(date + " Date does match!");
+//
+//                }
+//            }
 
             // Add the last five_day_forecast at the end of the loop
             tempForecast.calculateAverageTemp();
@@ -550,6 +563,8 @@ public class JSONParser {
     }
 
     private void parseSingleDayForecast(JSONObject response){
+            Log.d("TAG", "Single Day JSONObj response=" + response);
+
         try {
 
             single_day_forecast = new Model_Forecast();

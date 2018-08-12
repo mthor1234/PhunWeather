@@ -119,7 +119,6 @@ implements Interface_Communicate_With_Adapter {
         }
 
         // Set the adapter
-//        if (view instanceof RecyclerView) {
         if (view instanceof ListView) {
 
             System.out.println("Setting the Adapter!!!!");
@@ -220,98 +219,7 @@ implements Interface_Communicate_With_Adapter {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
 
-//        for(Model_Forecast item: weather_forecast){
-
-//            editor.putString("current temp", gson.toJson(item.getCurrentTemp()));
-//            editor.putString("date", gson.toJson(item.getDate()));
-//            editor.putString("description", gson.toJson(item.getDescription()));
-//            editor.putString("min temp", gson.toJson(item.getMinTemp()));
-//            editor.putString("max temp", gson.toJson(item.getMaxTemp()));
-//            editor.putString("humidity", gson.toJson(item.getHumidity()));
-
-
-//        public int getCurrentTemp() {
-//                return currentTemp;
-//            }
-//
-//            public int getMinTemp() {
-//                return minTemp;
-//            }
-//
-//            public int getMaxTemp() {
-//                return maxTemp;
-//            }
-//
-//            public int getHumidity() {
-//                return humidity;
-//            }
-//
-//            public int getWindSpeed() {
-//                return windSpeed;
-//            }
-//
-//            public String getDescription() {
-//                return description;
-//            }
-//
-//            public String getDate() {
-//                return date;
-//            }
-//
-//            public int getDrawableID() {
-//                return drawableID;
-//            }
-//
-//            public ArrayList<Integer> getMinTemps() {
-//                return minTemps;
-//            }
-//
-//            public ArrayList<Integer> getMaxTemps() {
-//                return maxTemps;
-//            }
-//
-//            public ArrayList<Integer> getHumidities() {
-//                return humidities;
-//            }
-//
-//            public ArrayList<Integer> getWindSpeeds() {
-//                return windSpeeds;
-//            }
-//
-//            public ArrayList<Long> getTimes() {
-//                return times;
-//            }
-//
-//            public ArrayList<CharSequence> getSunrises() {
-//                return sunrises;
-//            }
-//
-//            public ArrayList<CharSequence> getSunsets() {
-//                return sunsets;
-//            }
-//
-//            public ArrayList<String> getWeather_Descriptions() {
-//                return weather_Descriptions;
-//            }
-//
-//            public ArrayList<Integer> getWeatherIcons() {
-//                return weatherIcons;
-//            }
-
-
-
-//            editor.apply();
         }
-
-
-
-
-//        SharedPreferences sharedPreferences = getContext().getSharedPreferences("shared preferences", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(weather_forecast);
-//        editor.putString("weather forecast", json);
-//        editor.apply();
 
     // Recover data from SharedPreferences
     private void loadData(){
