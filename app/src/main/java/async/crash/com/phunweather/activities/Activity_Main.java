@@ -34,22 +34,6 @@ import async.crash.com.phunweather.Networking.JSONParser;
 import async.crash.com.phunweather.R;
 
 
-/*
-Summary: Added a switch within the toolbar to handle if the user would like units displayed in Celsius or Fahrenheit
-
-    1) Added switch to toolbar.xml
-
-    2) Activity_Main
-        - Set view
-        - Created boolean to hold weather checked or not
-        - OnCheckedChangeListener
-        - JSONParser now takes a boolean which equates to:
-            * true: imperial
-            * false: metric
-    3)
- */
-
-
 public class Activity_Main extends AppCompatActivity
         implements Fragment_Zipcode.OnListFragmentInteractionListener,
         Fragment_Detail.OnFragmentInteractionListener,
@@ -180,6 +164,7 @@ public class Activity_Main extends AppCompatActivity
 
         } else {
             currentFragment = savedInstanceState.getInt("currentFragment");
+
             fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
 
             loadData();
@@ -197,6 +182,7 @@ public class Activity_Main extends AppCompatActivity
                 hideKeyboard(this);
 
                         // Used setting the correct Fragment on screen rotation
+
                         loadData();
 
 
@@ -221,11 +207,14 @@ public class Activity_Main extends AppCompatActivity
             }
         }
 
+
         //--------- Switch ---------- //
         switch_units = (Switch) findViewById(R.id.switch_units);
         switch_units.setTextOff(getString(R.string.c));
         switch_units.setTextOn(getString(R.string.f));
         switch_units.setChecked(true);
+
+
 
 
     //--------- End Setting Views ---------- //
@@ -248,6 +237,7 @@ public class Activity_Main extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
     // Implements from Fragment_Zipcode
