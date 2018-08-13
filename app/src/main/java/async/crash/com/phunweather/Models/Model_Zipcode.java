@@ -2,6 +2,7 @@ package async.crash.com.phunweather.Models;
 
 /**
  * Created by mitchthornton on 7/31/18.
+ * SUMMARY: Used to hold zip code information
  */
 
 public class Model_Zipcode {

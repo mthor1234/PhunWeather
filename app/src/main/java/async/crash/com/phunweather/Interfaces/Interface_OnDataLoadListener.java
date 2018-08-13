@@ -8,6 +8,7 @@ import async.crash.com.phunweather.Models.Model_Forecast;
 
 /**
  * Created by mitchthornton on 8/12/18.
+ * Used for Activity <----> Fragment communication
  */
 
 public interface Interface_OnDataLoadListener {

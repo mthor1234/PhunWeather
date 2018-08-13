@@ -6,6 +6,7 @@ import async.crash.com.phunweather.Models.Model_Zipcode;
 
 /**
  * Created by mitchthornton on 8/4/18.
+ * Used for Activity <----> Fragment communication
  */
 
 public interface Interface_Communicate_With_Adapter {

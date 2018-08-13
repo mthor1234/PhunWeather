@@ -20,13 +20,8 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
-
 import java.util.ArrayList;
 
-import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Detail_Item;
 import async.crash.com.phunweather.Adapters.Adapter_RecyclerView_Zipcode;
 import async.crash.com.phunweather.Fragments.Fragment_Detail;
 import async.crash.com.phunweather.Fragments.Fragment_Zipcode;
@@ -63,28 +58,17 @@ public class Activity_Main extends AppCompatActivity
 // ------ Static ------ //
 
     private static final String TAG = Activity_Main.class.getSimpleName();
-    private static final String BASE_OPENWEATHERMAP_URL = "https://samples.openweathermap.org/data/2.5/forecast/daily?zip=94040&appid=b6907d289e10d714a6e88b30761fae22";
-    private static final String OPENWEATHERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
-
     public static final int FRAGMENT_ZIPCODE = 0;
     public static final int FRAGMENT_DETAIL = 1;
-
-
-// ------ Volley ------ //
-    private JsonArrayRequest request;
-    private RequestQueue requestQueue;
-    private RequestQueue mRequestQueue;
-    private StringRequest mStringRequest;
 
 
 // ------ Fragments ------ //
     private Fragment fragment_detail;
     private Fragment fragment_zip;
-    private Fragment mContent; // Keeps Instance State
 
 
 // ------ Interfaces ------ //
-    // Used to update adapters within those fragments
+    // Used to communicate with fragments
     private Interface_Communicate_With_Adapter listener_Detail_Fragment;
     private Interface_Communicate_With_Adapter listener_Zipcode_Fragment;
     private Interface_Communicate_UnitType listener_unitType;
@@ -98,7 +82,6 @@ public class Activity_Main extends AppCompatActivity
 
 // ------ Adapters ------ //
     // Creating fragment_detail_adapter for Detail
-    private Adapter_RecyclerView_Detail_Item fragment_detail_adapter;
     private Adapter_RecyclerView_Zipcode fragment_zipcode_adapter;
 
     private ProgressDialog pDialog;
@@ -123,12 +106,14 @@ public class Activity_Main extends AppCompatActivity
          false: "metric"
          true: "imperial"
      imperial by default   */
-
     private boolean unitType = true;
 
 
+// ------ Toolbar ------ //
     private Toolbar toolbar;
 
+
+// ------ Networking ------ //
     private JSONParser jsonParser;
 
 
@@ -149,7 +134,7 @@ public class Activity_Main extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         et_enterZip = (EditText) findViewById(R.id.et_zipcode);
-        et_enterZip.setHint("Enter Zip Code");
+        et_enterZip.setHint(R.string.enter_zip_code);
         et_enterZip.setEnabled(true);
 
         //--------- Click Listeners ---------- //
@@ -164,7 +149,8 @@ public class Activity_Main extends AppCompatActivity
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    addZipCode();
+
+                    zipcode_adapter_AddItem(new Model_Zipcode(et_enterZip.getText().toString()));
 
                     handled = true;
                 }
@@ -174,7 +160,6 @@ public class Activity_Main extends AppCompatActivity
 
 
         if (savedInstanceState == null) {
-            System.out.println("Saved Instance State = null");
             currentFragment = FRAGMENT_ZIPCODE;
 
             loadData();
@@ -194,18 +179,13 @@ public class Activity_Main extends AppCompatActivity
 
 
         } else {
-            System.out.println("Saved Instance State != null");
             currentFragment = savedInstanceState.getInt("currentFragment");
-            System.out.println(currentFragment);
-
             fragment_zip = fm.getFragment(savedInstanceState, "Fragment_Zipcode");
 
             loadData();
 
 
             //--------- Fragment ---------- //
-
-            System.out.println("CASE: Fragment Detail!!");
 
 
             if(currentFragment == FRAGMENT_DETAIL){
@@ -221,7 +201,7 @@ public class Activity_Main extends AppCompatActivity
 
 
                         // Called to properly handle the Edit_Text
-                        et_enterZip.setHint(selected_zipCode + " Forecast");
+                        et_enterZip.setHint(selected_zipCode + " " + getString(R.string.forecast));
                         et_enterZip.setEnabled(false);
 
                 }
@@ -234,7 +214,7 @@ public class Activity_Main extends AppCompatActivity
                         .commit();
 
                 // Called to properly handle the Edit_Text
-                et_enterZip.setHint("Enter Zip Code");
+                et_enterZip.setHint(R.string.enter_zip_code);
                 et_enterZip.setEnabled(true);
 
 
@@ -243,8 +223,8 @@ public class Activity_Main extends AppCompatActivity
 
         //--------- Switch ---------- //
         switch_units = (Switch) findViewById(R.id.switch_units);
-        switch_units.setTextOff("C");
-        switch_units.setTextOn("F");
+        switch_units.setTextOff(getString(R.string.c));
+        switch_units.setTextOn(getString(R.string.f));
         switch_units.setChecked(true);
 
 
@@ -252,24 +232,6 @@ public class Activity_Main extends AppCompatActivity
 
         // Setting interface to allow Activity_Main to call fragment_zip.updateAdapter()
         set_Fragment_Zipcode_Listener((Interface_Communicate_With_Adapter) fragment_zip);
-
-
-
-//        switch_units.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//
-//                if(isChecked){
-//                    System.out.println("Switch is checked!");
-//                    unitType = true;
-//                }else{
-//                    System.out.println("Switch is not checked!");
-//                    unitType = false;
-//                }
-//            }
-//        });
-
-
 
     }
 
@@ -317,6 +279,9 @@ public class Activity_Main extends AppCompatActivity
 
     }
 
+
+// ------------- INTERFACES --------------- //
+
     // Interface used to communicate with RecyclerView which acts upon the Fragment_Detail
     public void set_Fragment_Detail_Listener(Interface_Communicate_With_Adapter listener) {
         listener_Detail_Fragment = listener ;
@@ -340,20 +305,17 @@ public class Activity_Main extends AppCompatActivity
 
     public void updateFragment_ZipcodeAdapater(){
         // Updates the fragment_detail_adapter
-
-        System.out.println("-------------> UpdatingFragment_ZipcodeAdapter: " + selected_zipCode);
         listener_Zipcode_Fragment.updateAdapter();
     }
 
+    // Interface to add a Model_Zipcode to Fragment_Detail
     public void zipcode_adapter_AddItem(Model_Zipcode zipCode){
-        System.out.println("-------------> Adding Item to ZipCode Frag: " + zipCode.getZipcode());
         et_enterZip.setText("");
-
         listener_Zipcode_Fragment.addArrayListItem(zipCode);
     }
 
+    // Interface to set ArrayList<Model_Zipcode> as Fragment_Detail's arraylist of zipcodes
     public void zipcode_adapter_setArrayList(ArrayList<Model_Zipcode> zipCodes){
-        System.out.println("-------------> Setting ArrayList to ZipCode Frag: " + zipCodes.size());
         listener_Zipcode_Fragment.setArrayList(zipCodes);
     }
 
@@ -364,7 +326,6 @@ public class Activity_Main extends AppCompatActivity
 
         fragment_detail = new Fragment_Detail().newInstance();
 
-//                fragment_detail = new Fragment_Detail().newInstance(models);
         FragmentManager fm = getSupportFragmentManager();
         fm.popBackStack();
         fm.beginTransaction()
@@ -376,26 +337,17 @@ public class Activity_Main extends AppCompatActivity
 
         listener_OnDataLoaded.onDataLoaded(context, models);
 
-
     }
 
-    public void changeUnitType(boolean unitType){
-        // Updates the fragment_detail_adapter
-        listener_unitType.changeUnitType(unitType);
-    }
 
-//    public void addToFiveDayForecast(Model_Forecast forecast){
-//        models.add(forecast);
-//    }
-
-
+// -------- Process Dialog ------- //
     public void startProcessDialog(){
         if(pDialog == null){
             pDialog = new ProgressDialog(this);
         }
 
         if (!pDialog.isShowing()) {
-            pDialog.setMessage("Loading...");
+            pDialog.setMessage(getString(R.string.loading));
             pDialog.show();
         }
     }
@@ -407,18 +359,16 @@ public class Activity_Main extends AppCompatActivity
         }
     }
 
-    public void addZipCode() {
-        String enteredZipcode = et_enterZip.getText().toString();
-        zipcode_adapter_AddItem(new Model_Zipcode(enteredZipcode));
-    }
 
 
     // Hides the softkeyboard
     //  - Used when a another fragment is added
     public static void hideKeyboard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+
         //Find the currently focused view, so we can grab the correct window token from it.
         View view = activity.getCurrentFocus();
+
         //If no view currently has focus, create a new one, just so we can grab a window token from it
         if (view == null) {
             view = new View(activity);
@@ -430,32 +380,23 @@ public class Activity_Main extends AppCompatActivity
 // -------------- DATA Persistence ----------------- //
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        System.out.println("Activity Saving Instance State");
-
         outState.putInt("currentFragment", currentFragment);
-
         super.onSaveInstanceState(outState);
 
-        saveData();
+
+        // Save data to shared preferences
+            //  1) GrabShared Preferences Obj
+            //  2) Create Gson Object
+            //  3) Save currently selected zip as JSON by using GSON
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("selected zipcode", selected_zipCode);
+        editor.apply();
+
+
 
         //Save the fragment's instance
         getSupportFragmentManager().putFragment(outState, "Fragment_Zipcode", fragment_zip);
-
-
-    }
-
-    // Save data to shared preferences
-    //  1) GrabShared Preferences Obj
-    //  2) Create Gson Object
-    //  3) Save arraylist of zipcodes as JSON by using GSON
-    private void saveData(){
-        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        Gson gson = new Gson();
-//        String json = gson.toJson(al_zipCodes);
-//        editor.putString("zipcodes", json);
-        editor.putString("selected zipcode", selected_zipCode);
-        editor.apply();
 
     }
 
@@ -466,12 +407,12 @@ public class Activity_Main extends AppCompatActivity
 
     }
 
+
+    // When user clicks back button
+    //  - Used to handle the Edit Text text & enabling on the Toolbar
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-        System.out.println("onBackPressed!");
-
         if (fragment_detail != null) {
             if (fragment_detail.isVisible()) {
                 et_enterZip.setHint(selected_zipCode + " Forecast");
@@ -485,25 +426,22 @@ public class Activity_Main extends AppCompatActivity
         }
     }
 
+
+    // Used to interact with Fragment_Detail when an item is clicked
+    // Currently not using it but may be useful in the future
+    @Override
+    public void onListFragmentInteraction(Model_Forecast item) {
+
+    }
+
+
+// ----------------- Getters / Setters ------------------- //
     public ArrayList<Model_Forecast> getModels() {
         return models;
     }
-
 
     public void setModels(ArrayList<Model_Forecast> models) {
         this.models = models;
     }
 
-    public ArrayList<Model_Zipcode> getAl_zipCodes() {
-        return al_zipCodes;
-    }
-
-    public void setAl_zipCodes(ArrayList<Model_Zipcode> al_zipCodes) {
-        this.al_zipCodes = al_zipCodes;
-    }
-
-    @Override
-    public void onListFragmentInteraction(Model_Forecast item) {
-
-    }
 }

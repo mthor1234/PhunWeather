@@ -5,6 +5,13 @@
     <string name="action_search">Search</string>
     <string name="delete">Delete</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="imperial">Imperial</string>
+    <string name="metric">Metric</string>
+    <string name="enter_zip_code">Enter Zip Code</string>
+    <string name="forecast">Forecast</string>
+    <string name="c">C</string>
+    <string name="f">F</string>
+    <string name="loading">Loading...</string>
+    <string name="dummy_content">Dummy Content</string>
 </resources>

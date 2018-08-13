@@ -21,7 +21,7 @@ import async.crash.com.phunweather.R;
  * Adapter holds indexes of unfolded elements for correct work with default reusable views behavior
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
+public class Adapter_ListView_Detail extends ArrayAdapter<Model_Forecast> {
 
     private HashSet<Integer> unfoldedIndexes = new HashSet<>();
     private View.OnClickListener defaultRequestBtnClickListener;
@@ -29,7 +29,7 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
     // Imperial by default
     private boolean unitType = true;
 
-    public Adapter_Unfolding(Context context, List<Model_Forecast> objects, Fragment_Detail.OnFragmentInteractionListener listener) {
+    public Adapter_ListView_Detail(Context context, List<Model_Forecast> objects, Fragment_Detail.OnFragmentInteractionListener listener) {
         super(context, 0, objects);
     }
 
@@ -154,8 +154,8 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             viewHolder.tv_weatherDescription.setText(item.getWeather_Descriptions().get(0));
             viewHolder.tv_weatherDescription_unfolded.setText(item.getWeather_Descriptions().get(0));
         }else{
-            viewHolder.tv_weatherDescription.setText("Dummy Content");
-            viewHolder.tv_weatherDescription_unfolded.setText("Dummy Content");
+            viewHolder.tv_weatherDescription.setText(R.string.dummy_content);
+            viewHolder.tv_weatherDescription_unfolded.setText(R.string.dummy_content);
 
         }
 
@@ -165,7 +165,7 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             viewHolder.tv_sunRise.setText( item.getSunrises().get(0));
         }
         else{
-            viewHolder.tv_sunRise.setText("12345");
+            viewHolder.tv_sunRise.setText(R.string.dummy_content);
         }
 
         if(item.getSunsets().size() > 0) {
@@ -173,7 +173,7 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             viewHolder.tv_sunSet.setText( item.getSunsets().get(0));
         }
         else{
-            viewHolder.tv_sunSet.setText("12345");
+            viewHolder.tv_sunSet.setText(R.string.dummy_content);
         }
 
 
