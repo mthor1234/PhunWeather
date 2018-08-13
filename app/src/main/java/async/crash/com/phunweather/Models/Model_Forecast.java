@@ -6,56 +6,13 @@ import java.util.ArrayList;
 
 /**
  * Created by mitchthornton on 8/1/18.
- *
- * Holds the data for the weather forecast
- *
- * https://www.youtube.com/watch?v=Px9KanE-ohk
- *
- *
- * JSON Response from OpenWeatherMap
- *  {
- "cod":"200",
- "message":0.0042,
- "cnt":38,
- "list":[
- {
- "dt":1533276000,
- "main":{
- "temp":298.81,
- "temp_min":298.685,
- "temp_max":298.81,
- "pressure":1010.75,
- "sea_level":1029.94,
- "grnd_level":1010.75,
- "humidity":58,
- "temp_kf":0.13
- },
- "weather":[
- {
- "id":800,
- "main":"Clear",
- "description":"clear sky",
- "icon":"01d"
- }
- ],
- "clouds":{
- "all":0
- },
- "wind":{
- "speed":2.41,
- "deg":309.506
- },
- "sys":{
- "pod":"d"
- },
- "dt_txt":"2018-08-03 06:00:00"
- },
+ * SUMMARY: Holds the data for a day within the weather forecast
  */
 
 public class Model_Forecast {
 
 // ------ ints ------ //
-    private int currentTemp, humidity, windSpeed;
+    private int currentTemp, currentTemp_Metric, humidity, windSpeed, windSpeed_Metric;
     private int drawableID;
 
 
@@ -63,20 +20,24 @@ public class Model_Forecast {
     private String description, date;
 
 // ------ ints ------ //
-    private int maxTemp = -99;
     private int minTemp = 99;
+    private int minTemp_Metric = 99;
+
+    private int maxTemp = -99;
+    private int maxTemp_Metric = -99;
 
 
 // ------ ArrayLists ------ //
     private ArrayList<Integer> minTemps = new ArrayList<Integer>();
+    private ArrayList<Integer> minTemps_Metric = new ArrayList<Integer>();
     private ArrayList<Integer> maxTemps = new ArrayList<Integer>();
+    private ArrayList<Integer> maxTemps_Metric = new ArrayList<Integer>();
     private ArrayList<Integer> humidities = new ArrayList<Integer>();
     private ArrayList<Integer> windSpeeds = new ArrayList<Integer>();
+    private ArrayList<Integer> windSpeeds_Metric = new ArrayList<Integer>();
     private ArrayList<Integer> weatherIcons = new ArrayList<Integer>();
     private ArrayList<CharSequence> sunrises = new ArrayList<CharSequence>();
     private ArrayList<CharSequence> sunsets = new ArrayList<CharSequence>();
-
-
     private ArrayList<Long> times = new ArrayList<Long>();
     private ArrayList<String> weather_Descriptions = new ArrayList<String>();
 
@@ -85,61 +46,34 @@ public class Model_Forecast {
     private View.OnClickListener requestBtnClickListener;
 
 
-    public Model_Forecast(int currentTemp, int minTemp, int maxTemp, int humidity, int windSpeed, String description, String date, int drawableID) {
-        this.currentTemp = currentTemp;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
-        this.humidity = humidity;
-        this.windSpeed = windSpeed;
-        this.description = description;
-        this.date = date;
-        this.drawableID = drawableID;
-    }
-
-    public Model_Forecast(int minTemp, int maxTemp, int humidity, int windSpeed, String description, String date, int drawableID) {
-        this.currentTemp = currentTemp;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
-        this.humidity = humidity;
-        this.windSpeed = windSpeed;
-        this.description = description;
-        this.date = date;
-        this.drawableID = drawableID;
-    }
-
-    public Model_Forecast(ArrayList<Integer> minTemps, ArrayList<Integer> maxTemps, ArrayList<Integer> humidities, ArrayList<Integer> windSpeeds, ArrayList<Long> times, int drawableID, ArrayList<String> weather_Descriptions) {
-        this.minTemps = minTemps;
-        this.maxTemps = maxTemps;
-        this.humidities = humidities;
-        this.windSpeeds = windSpeeds;
-        this.times = times;
-        this.drawableID = drawableID;
-
-        this.weather_Descriptions = weather_Descriptions;
-    }
 
     public Model_Forecast() {
-//        this.minTemp = calculateMinTemp();
-//        this.maxTemp = calculateMaxTemp();
     }
 
 
     public void addMinTemp(int minTemp){
         minTemps.add(minTemp);
 
+        minTemps_Metric.add(convertTempToMetric(minTemp));
+
         if(this.minTemp > minTemp){
             this.minTemp = minTemp;
+            this.minTemp_Metric = convertTempToMetric(minTemp);
         }
 
     }
 
     public void addMaxTemp(int maxTemp){
         maxTemps.add(maxTemp);
+        maxTemps_Metric.add(convertTempToMetric(maxTemp));
+
 
         if(this.maxTemp < maxTemp){
             this.maxTemp = maxTemp;
+            this.maxTemp_Metric = convertTempToMetric(maxTemp);
         }
     }
+
 
     public void addHumidity(int humidity){
         humidities.add(humidity);
@@ -147,6 +81,7 @@ public class Model_Forecast {
 
     public void addWindSpeed(int windSpeed){
         windSpeeds.add(windSpeed);
+        windSpeeds_Metric.add((int) (windSpeed * 1.6));
     }
 
     public void addTime(long time){
@@ -167,11 +102,13 @@ public class Model_Forecast {
 
     public void print(){
         System.out.println("Printing forecast!!!: ");
+            System.out.println("Date:  " + getDate());
+
         for(int temp: minTemps){
-            System.out.println("Min Temp: " + temp);
+            System.out.println("Min Temp: " + minTemp);
         }
         for(int temp: maxTemps){
-            System.out.println("Max Temp: " + temp);
+            System.out.println("Max Temp: " + maxTemp);
         }
         for(int humidity: humidities){
             System.out.println("Min humidity: " + humidity);
@@ -180,6 +117,8 @@ public class Model_Forecast {
 
     public void calculateAverageTemp(){
         currentTemp = (minTemp + maxTemp)/2;
+        currentTemp_Metric = (minTemp_Metric + maxTemp_Metric)/2;
+
     }
 
     public void calculateAverageTemp(int temp){
@@ -221,6 +160,7 @@ public class Model_Forecast {
     public void addWeatherIconPath(int id){weatherIcons.add(id);}
 
 
+
     // TODO: Create a method to generate the most common icon
     // Needs to match the description
     public void calculateWeatherIcon(){
@@ -232,8 +172,8 @@ public class Model_Forecast {
         }
 
     }
-//
-//
+
+    // Left this for future implementation
 //    public int calculateMaxTemp(){
 //
 //        for(int maxTemp: maxTemps){
@@ -243,6 +183,10 @@ public class Model_Forecast {
 //        }
 //        return currMaxTemp;
 //    }
+
+    public int convertTempToMetric(int temp){
+        return (Integer)((temp - 32)* 5/9);
+    }
 
     public View.OnClickListener getRequestBtnClickListener() {
         return requestBtnClickListener;
@@ -259,8 +203,25 @@ public class Model_Forecast {
         return currentTemp;
     }
 
+
+    public int getCurrentTemp_Metric() {
+        return currentTemp_Metric;
+    }
+
+    public int getWindSpeed_Metric() {
+        return windSpeed_Metric;
+    }
+
+    public int getMaxTemp_Metric() {
+        return maxTemp_Metric;
+    }
+
     public int getMinTemp() {
         return minTemp;
+    }
+
+    public int getMinTemp_Metric() {
+        return minTemp_Metric;
     }
 
     public int getMaxTemp() {
@@ -291,6 +252,14 @@ public class Model_Forecast {
         return minTemps;
     }
 
+    public ArrayList<Integer> getMinTemps_Metric() {
+        return minTemps_Metric;
+    }
+
+    public ArrayList<Integer> getMaxTemps_Metric() {
+        return maxTemps_Metric;
+    }
+
     public ArrayList<Integer> getMaxTemps() {
         return maxTemps;
     }
@@ -301,6 +270,10 @@ public class Model_Forecast {
 
     public ArrayList<Integer> getWindSpeeds() {
         return windSpeeds;
+    }
+
+    public ArrayList<Integer> getWindSpeeds_Metric() {
+        return windSpeeds_Metric;
     }
 
     public ArrayList<Long> getTimes() {
@@ -327,6 +300,10 @@ public class Model_Forecast {
 
     public void setCurrentTemp(int currentTemp) {
         this.currentTemp = currentTemp;
+    }
+
+    public void setCurrentTemp_Metric(int currentTemp) {
+        this.currentTemp_Metric = convertTempToMetric(currentTemp);
     }
 
     public void setMinTemp(int minTemp) {

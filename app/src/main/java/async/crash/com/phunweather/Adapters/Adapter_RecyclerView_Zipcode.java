@@ -17,7 +17,10 @@ import async.crash.com.phunweather.R;
 /**
  * {@link RecyclerView.Adapter} that can display a {@link Model_Zipcode} and makes a call to the
  * specified {@link Fragment_Zipcode.OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ *
+ * SUMMARY:
+ * Standard RecyclerView
+ * Used to hold user entered zip codes
  */
 public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_RecyclerView_Zipcode.ViewHolder> {
 
@@ -25,7 +28,6 @@ public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_R
     private final List<Model_Zipcode> mValues;
     private final Fragment_Zipcode.OnListFragmentInteractionListener mListener;
 
-//    public Adapter_RecyclerView_Zipcode(List<DummyItem> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
     public Adapter_RecyclerView_Zipcode(Context context, List<Model_Zipcode> items, Fragment_Zipcode.OnListFragmentInteractionListener listener) {
         this.context = context;
         mValues = items;
@@ -49,10 +51,6 @@ public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_R
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-//                    Snackbar.make(v , "Item Clicked for a Short Time!", Snackbar.LENGTH_INDEFINITE);
-                    System.out.println("Clicked");
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
             }
@@ -61,8 +59,6 @@ public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_R
         holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-//                Snackbar.make(v, "Item Clicked for a LOOOONNNG Time!", Snackbar.LENGTH_INDEFINITE);
-                System.out.println("Long Click");
                 return true;
             }
         });

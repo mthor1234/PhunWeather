@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 
 import com.android.volley.Cache;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -38,40 +39,94 @@ import async.crash.com.phunweather.activities.Activity_Main;
 
 /**
  * Created by mitchthornton on 8/3/18.
+ *
+ * SUMMARY: Used to make API calls to OpenWeatherMap.
+ * Uses Volley library to make the calls asynchronously.
+ *      - Volley is lifecycle aware
+ *      - Utilizes caching and network calls
+ *      - Cache responses are set for 24 hours to expire
+ *
+ *      - NOTE: Believe I found a bug in the Volley library
+ *              which causing it to make multiple network calls even though it is not desired
+ *
+ *
+ *      https://developer.android.com/training/volley/
+ *
+ * Uses singleDayForecast() and FiveDayForecast() to retrieve information via cache or network call
+ *
+ * singleDayForecast()
+ *      Summary:
+ *               Creates the Model_Forecast responsible for holding today's weather forecast
+ *               Gives a little more information that is not found within the 5 Day Forecast API call,
+ *               Such as sunrise and sunset information
+ *
+ *      How it Works:
+ *                  Either uses a cached response or calls parseSingleDayForecast()
+ *                  Parses through the network response, creating a Model_Forecast object to store the information
+ *                  This is added into ArrayList<Model_Forecast> to hold a six day forecast
+ *
+ *
+*  fiveDayForecast()
+ *      Summary:
+ *               Creates the ArrayList<Model_Forecast> responsible for holding the five day weather forecast
+ *               Each day in the forecast is a Model_Forecast
+
+ *
+ *      How it Works:
+ *                  Either uses a cached response or calls parseFiveDayForecast()
+ *                  Parses through the network response, creating a Model_Forecast object to store the information
+ *                  This is added into ArrayList<Model_Forecast> to hold a six day forecast
+ *
+*  TODO: Depending on the forecast location / api call, the five day forecast may give today's date as well
+ *  This causes a potential duplicate day for today's date
  */
 
 public class JSONParser {
 
+// ---------- Static ---------- //
     private static final String TAG = JSONParser.class.getSimpleName();
-
-
     private static final String OPENWEATERMAP_API_KEY = "ae1d2194a7816e11b58f5e4fcc19f195";
 
-    private String zipcode, unit_type;
 
+// ---------- String ---------- //
+    private String zipcode, unit_type;
     private String openWeatherMap_FiveDayForecast_URL;
     private String openWeatherMap_CurrentForecast_URL;
 
+// ---------- Activity ---------- //
     private Activity_Main activity_main;
 
+// ---------- Formats ---------- //
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat updateddateFormat = new SimpleDateFormat("EEEE MMM dd, yyyy");
 
-
+// ---------- ArrayList ---------- //
     private ArrayList<Model_Forecast> five_day_forecast = new ArrayList<Model_Forecast>();
-    private Model_Forecast single_day_forecast = new Model_Forecast();
+    private ArrayList<Model_Forecast> forecast = new ArrayList<Model_Forecast>();
 
 
-    public JSONParser(final Activity_Main activity_main, String zipcode, String unit_type) {
+    private Model_Forecast single_day_forecast;
+
+
+    public JSONParser(final Activity_Main activity_main, String zipcode, boolean unit_type) {
         this.zipcode = zipcode;
         this.activity_main = activity_main;
-        this.unit_type = unit_type;
+
+
+    // API can return metric, but as of right now, data is fetched as imperical and converted locally
+    // Left this in case a metric network responses may be of use in the future
+        if(unit_type == false){
+            this.unit_type = "metric";
+        }else{
+            this.unit_type = "imperial";
+        }
 
         // Generate URI / URL safe encodings to call the API's
         openWeatherMap_FiveDayForecast_URL = uriBuilder_fiveDayForecast();
         openWeatherMap_CurrentForecast_URL = uriBuilder_currentForecast();
 
-        // Caching
+
+// --------- CACHING CODE ------------ //
 
         Cache cache = AppController.getInstance().getRequestQueue().getCache();
 
@@ -87,8 +142,6 @@ public class JSONParser {
 
             try {
                 String data = new String(entry_single_forecast.data, "UTF-8");
-                System.out.println("Entry is not Null! Getting cached singleDayForecast: " + data);
-
                 Gson gson = new Gson();
                 parseSingleDayForecast(new JSONObject(data));
 
@@ -115,8 +168,6 @@ public class JSONParser {
                 checkInternetConnection();
 
                 String data = new String(entry_fiveday_forecast.data, "UTF-8");
-                System.out.println("Entry is not Null! Getting cached FiveDayForecast: " + data);
-
                 parseFiveDayForecast(new JSONObject(data));
 
             } catch (UnsupportedEncodingException e) {
@@ -126,7 +177,6 @@ public class JSONParser {
             }
 
         } else {
-            System.out.println("Entry is Null! Making Five Day Forecast API Call: ");
             // Internet connection is required if there is no cached data
             if (checkInternetConnection()) {
                 fiveDayForecast();
@@ -134,6 +184,8 @@ public class JSONParser {
 
         }
     }
+
+
 
     /*
     Used to build the API URLs for the five day five_day_forecast and single day five_day_forecast
@@ -167,6 +219,154 @@ public class JSONParser {
         String myUrl = builder.build().toString();
         return myUrl;
     }
+
+    // Do a single day five_day_forecast API call and parse JSON. Save results into ArrayList
+    private void singleDayForecast() {
+
+        // Start the process dialog to alert user of loading time
+        activity_main.startProcessDialog();
+
+        RequestQueue requestQueue = Volley.newRequestQueue(activity_main);
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                openWeatherMap_CurrentForecast_URL
+                , null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                parseSingleDayForecast(response);
+
+            }
+
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                VolleyLog.d("TAG", "JSONObj Error: " + error.getMessage());
+
+                // If errored out, hide the progress dialog
+                activity_main.hidePDialog();
+
+                Snackbar.make(activity_main.findViewById(R.id.fragment_container), "Unable to fetch information. Try again", Snackbar.LENGTH_SHORT).show();
+            }
+        })
+
+                // Caching the response
+        {
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    Cache.Entry cacheEntry = HttpHeaderParser.parseCacheHeaders(response);
+                    if (cacheEntry == null) {
+                        cacheEntry = new Cache.Entry();
+                    }
+
+                    Log.d(TAG, "Caching!");
+
+                    final long cacheHitButRefreshed = 3 * 60 * 1000; // in 3 minutes cache will be hit, but also refreshed on background
+                    final long cacheExpired = 24 * 60 * 60 * 1000; // in 24 hours this cache entry expires completely
+                    long now = System.currentTimeMillis();
+                    final long softExpire = now + cacheHitButRefreshed;
+                    final long ttl = now + cacheExpired;
+                    cacheEntry.data = response.data;
+                    cacheEntry.softTtl = softExpire;
+                    cacheEntry.ttl = ttl;
+                    String headerValue;
+                    headerValue = response.headers.get("Date");
+                    if (headerValue != null) {
+                        cacheEntry.serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
+                    }
+                    headerValue = response.headers.get("Last-Modified");
+                    if (headerValue != null) {
+                        cacheEntry.lastModified = HttpHeaderParser.parseDateAsEpoch(headerValue);
+                    }
+                    cacheEntry.responseHeaders = response.headers;
+                    final String jsonString = new String(response.data,
+                            HttpHeaderParser.parseCharset(response.headers));
+                    return Response.success(new JSONObject(jsonString), cacheEntry);
+                } catch (UnsupportedEncodingException | JSONException e) {
+                    return Response.error(new ParseError(e));
+                }
+            }
+
+            @Override
+            protected void deliverResponse(JSONObject response) {
+                super.deliverResponse(response);
+
+            }
+
+            @Override
+            public void deliverError(VolleyError error) {
+                super.deliverError(error);
+            }
+
+            @Override
+            protected VolleyError parseNetworkError(VolleyError volleyError) {
+                return super.parseNetworkError(volleyError);
+            }
+        };
+
+
+        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(jsonObjReq);
+    }
+
+
+    private void parseSingleDayForecast(JSONObject response){
+        try {
+
+            single_day_forecast = new Model_Forecast();
+
+            JSONArray weather_array = response.getJSONArray("weather");
+            JSONObject mainObj = response.getJSONObject("main");
+            JSONObject windObj = response.getJSONObject("wind");
+            JSONObject sysObj = response.getJSONObject("sys");
+
+            Double minTemp = mainObj.getDouble("temp_min");
+            Double maxTemp = mainObj.getDouble("temp_max");
+
+
+            int weatherID = weather_array.getJSONObject(0).getInt("id");
+            String main_weather_description = weather_array.getJSONObject(0).getString("main");
+
+//            String previousDate = "";
+//
+//            CharSequence timeStampDate = formatTimeStamp(response.getLong("dt") * 1000);
+
+
+            String date = updateddateFormat.format(new Date());
+                if(!forecast.contains(date)){
+
+                single_day_forecast.setCurrentTemp((int) Math.round(mainObj.getDouble("temp")));
+                single_day_forecast.setCurrentTemp_Metric((int) Math.round(mainObj.getDouble("temp")));
+                single_day_forecast.addMinTemp((int) Math.round(minTemp));
+                single_day_forecast.addMaxTemp((int) Math.round(maxTemp));
+                single_day_forecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                single_day_forecast.addWindSpeed((int) windObj.getDouble("speed"));
+                single_day_forecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherID));
+                single_day_forecast.addWeatherDescription(main_weather_description);
+                single_day_forecast.setDate(date);
+
+                single_day_forecast.addSunrise(formatTimeStamp(sysObj.getLong("sunrise")*1000));
+                single_day_forecast.addSunset(formatTimeStamp(sysObj.getLong("sunset")*1000));
+
+
+                single_day_forecast.calculateWeatherIcon();
+                single_day_forecast.calculateAverageHumidity();
+                single_day_forecast.calculateAverageWind();
+
+            }
+        } catch (JSONException e1) {
+            e1.printStackTrace();
+        }
+        forecast.add(getSingle_day_forecast());
+
+        // Hides the process dialog, letting the user know that the background operation is over
+        activity_main.hidePDialog();
+    }
+
 
     // Holds all of the weeks forecasts.
     // Each Model_Forecast = a daily five_day_forecast
@@ -252,7 +452,7 @@ public class JSONParser {
     /*
     Note: There is no sunrise / sunset information for the fiveday five_day_forecast
      */
-    public void fiveDayForecast(){
+    private void fiveDayForecast(){
 
         // Start the process dialog to alert user of loading time
         activity_main.startProcessDialog();
@@ -275,9 +475,8 @@ public class JSONParser {
             @Override
             public void onErrorResponse(VolleyError error) {
                 VolleyLog.d("TAG", "JSONObj Error: " + error.getMessage());
-                //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
 
-                // If errored out, hide the progress dialog
+                // If errored out, hide the progress dialog and alert the user
                 activity_main.hidePDialog();
 
                 Snackbar.make(activity_main.findViewById(R.id.fragment_container), "Unable to fetch Fiveday information. Try again", Snackbar.LENGTH_SHORT).show();
@@ -285,6 +484,7 @@ public class JSONParser {
         })
 
         {
+            // Used for caching
             @Override
             protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
                 try {
@@ -337,122 +537,25 @@ public class JSONParser {
             }
         };
 
-
-        AppController.getInstance().addToRequestQueue(jsonObjReq);
-        requestQueue.add(jsonObjReq);
-    }
-
-    // Do a single day five_day_forecast API call and parse JSON. Save results into ArrayList
-    public void singleDayForecast() {
-
-        // Start the process dialog to alert user of loading time
-        activity_main.startProcessDialog();
-
-//        final Model_Forecast single_day_forecast = new Model_Forecast();
-
-        RequestQueue requestQueue = Volley.newRequestQueue(activity_main);
-
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
-                openWeatherMap_CurrentForecast_URL
-                , null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                Log.d("TAG", "Single Day Response: " + response + "\n" + "JSONObj Single Dayresponse=" + response);
-
-                parseSingleDayForecast(response);
-
-            }
-
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d("TAG", "JSONObj Error: " + error.getMessage());
-                //Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
-
-                // If errored out, hide the progress dialog
-                activity_main.hidePDialog();
-
-                Snackbar.make(activity_main.findViewById(R.id.fragment_container), "Unable to fetch information. Try again", Snackbar.LENGTH_SHORT).show();
-            }
-        })
-
-            // Caching the response
-            {
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                try {
-                    Cache.Entry cacheEntry = HttpHeaderParser.parseCacheHeaders(response);
-                    if (cacheEntry == null) {
-                        cacheEntry = new Cache.Entry();
-                    }
-
-                    Log.d(TAG, "Caching!");
-
-                    final long cacheHitButRefreshed = 3 * 60 * 1000; // in 3 minutes cache will be hit, but also refreshed on background
-                    final long cacheExpired = 24 * 60 * 60 * 1000; // in 24 hours this cache entry expires completely
-                    long now = System.currentTimeMillis();
-                    final long softExpire = now + cacheHitButRefreshed;
-                    final long ttl = now + cacheExpired;
-                    cacheEntry.data = response.data;
-                    cacheEntry.softTtl = softExpire;
-                    cacheEntry.ttl = ttl;
-                    String headerValue;
-                    headerValue = response.headers.get("Date");
-                    if (headerValue != null) {
-                        cacheEntry.serverDate = HttpHeaderParser.parseDateAsEpoch(headerValue);
-                    }
-                    headerValue = response.headers.get("Last-Modified");
-                    if (headerValue != null) {
-                        cacheEntry.lastModified = HttpHeaderParser.parseDateAsEpoch(headerValue);
-                    }
-                    cacheEntry.responseHeaders = response.headers;
-                    final String jsonString = new String(response.data,
-                            HttpHeaderParser.parseCharset(response.headers));
-                    return Response.success(new JSONObject(jsonString), cacheEntry);
-                } catch (UnsupportedEncodingException | JSONException e) {
-                    return Response.error(new ParseError(e));
-                }
-            }
-
-            @Override
-            protected void deliverResponse(JSONObject response) {
-                super.deliverResponse(response);
-            }
-
-            @Override
-            public void deliverError(VolleyError error) {
-                super.deliverError(error);
-            }
-
-            @Override
-            protected VolleyError parseNetworkError(VolleyError volleyError) {
-                return super.parseNetworkError(volleyError);
-            }
-        };
+        jsonObjReq.setRetryPolicy(new DefaultRetryPolicy(
+                0,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         requestQueue.add(jsonObjReq);
 
     }
 
-    private void parseFiveDayForecast(JSONObject response){
-
-        System.out.println("Parsing!");
 
 
+        private void parseFiveDayForecast(JSONObject response){
         five_day_forecast = new ArrayList<Model_Forecast>();
         Model_Forecast tempForecast = new Model_Forecast();
 
-
         try {
-
-            System.out.println("Got that five day forecast response!");
 
             JSONArray list = response.getJSONArray("list");
             Log.d("TAG", "JSONObj list=" + list);
-            Log.d("TAG", "JSONObj length=" + list.length());
-
 
             String previousDate = "";
 
@@ -467,59 +570,63 @@ public class JSONParser {
                 // Format date
                 date = formatDate(date);
 
+
+                System.out.println("i: " + i + " list length: " + list.length());
+
+                // TODO: Sometimes get duplicate entries. Added this if statement which I believe is on the right track but getting an error for i = 7 calculateweathericon() sometimes
+                // Getting duplicate volley reponses due to slow internet / error with Volley library
+                if(!forecast.contains(date)){
+
                 // New Day
-                if(!previousDate.matches(date)){
+                    if (!previousDate.matches(date) || i == list.length() - 1) {
 
-                    if(i != 0) {
-                        // 1. Create a Model_Forecast object (This is a weather five_day_forecast)
-                        // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
+                        if (i != 0) {
+                            // 1. Create a Model_Forecast object (This is a weather five_day_forecast)
+                            // 2. Add it to the ArrayList<Model> (This holds the all of the days forecasts)
 
-                        System.out.println("i: " + i + " Previous Date: " + previousDate + " date: " + date +  "Adding the previous forecast_model");
+                            tempForecast.calculateAverageTemp();
+                            tempForecast.calculateWeatherIcon();
+                            tempForecast.calculateAverageHumidity();
+                            tempForecast.calculateAverageWind();
 
-                        tempForecast.calculateAverageTemp();
-                        tempForecast.calculateWeatherIcon();
-                        tempForecast.calculateAverageHumidity();
-                        tempForecast.calculateAverageWind();
+                            five_day_forecast.add(tempForecast);
 
-//                        activity_main.getModels().add(single_day_forecast);
-                        five_day_forecast.add(tempForecast);
+                        }
+                        tempForecast = new Model_Forecast();
+
+                        String main_weather_description = weatherArray.getJSONObject(0).getString("main");
+
+                        tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                        tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                        tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                        tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                        tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
+                        tempForecast.setDate(date);
+                        tempForecast.addWeatherDescription(main_weather_description);
+
+                        previousDate = date;
+
+                        int weatherID = weatherArray.getJSONObject(0).getInt("id");
+
+                        int weatherIcon_DrawableID = getWeatherIconDrawablePath(activity_main, weatherID);
 
                     }
-                    tempForecast = new Model_Forecast();
 
-                    String main_weather_description = weatherArray.getJSONObject(0).getString("main");
+                    // Same date, add values to ArrayList
+                    else {
 
-                    tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
-                    tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
-                    tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-                    tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                    tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main,weatherArray.getJSONObject(0).getInt("id")));
-                    tempForecast.setDate(date);
-                    tempForecast.addWeatherDescription(main_weather_description);
+                        String main_weather_description = weatherArray.getJSONObject(0).getString("main");
 
-                    previousDate = date;
+                        tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
+                        tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
+                        tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
+                        tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
+                        tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
+                        tempForecast.addWeatherDescription(main_weather_description);
 
-                    int weatherID = weatherArray.getJSONObject(0).getInt("id");
-
-                    int weatherIcon_DrawableID = getWeatherIconDrawablePath(activity_main, weatherID);
+                    }
 
                 }
-
-                // Same date, add values to ArrayList
-                else{
-                    System.out.println("i: " + i + " Adding to old Forecast " + tempForecast.getDate());
-
-                    String main_weather_description = weatherArray.getJSONObject(0).getString("main");
-
-                    tempForecast.addMinTemp((int) Math.round(mainObj.getDouble("temp_min")));
-                    tempForecast.addMaxTemp((int) Math.round(mainObj.getDouble("temp_max")));
-                    tempForecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-                    tempForecast.addWindSpeed((int) Math.round(windObj.getDouble("speed")));
-                    tempForecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherArray.getJSONObject(0).getInt("id")));
-                    tempForecast.addWeatherDescription(main_weather_description);
-
-                }
-
             }
 
             // Add the last five_day_forecast at the end of the loop
@@ -529,16 +636,17 @@ public class JSONParser {
             tempForecast.calculateAverageWind();
 
 
-            // Add the final single_day_forecast to the activity_main models ArrayList<Forecast_Model>
-//                    activity_main.getModels().add(single_day_forecast);
-
-
             // Updates adapter via Activity -> Fragment communication
             // Utilizes an interface
 //            activity_main.updateFragment_DetailAdapater();
+            forecast.addAll(getFive_day_forecast());
+            activity_main.onDataLoaded(activity_main, getForecast());
+
+
 
             // Hides the process dialog, letting the user know that the background operation is over
             activity_main.hidePDialog();
+
 
 
 
@@ -547,58 +655,8 @@ public class JSONParser {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-    }
 
-    private void parseSingleDayForecast(JSONObject response){
-        try {
-
-            single_day_forecast = new Model_Forecast();
-
-            JSONArray weather_array = response.getJSONArray("weather");
-            JSONObject mainObj = response.getJSONObject("main");
-            JSONObject windObj = response.getJSONObject("wind");
-            JSONObject sysObj = response.getJSONObject("sys");
-
-            Double minTemp = mainObj.getDouble("temp_min");
-            Double maxTemp = mainObj.getDouble("temp_max");
-
-
-            int weatherID = weather_array.getJSONObject(0).getInt("id");
-            String main_weather_description = weather_array.getJSONObject(0).getString("main");
-
-            String previousDate = "";
-
-            CharSequence timeStampDate = formatTimeStamp(response.getLong("dt") * 1000);
-
-
-            String date = updateddateFormat.format(new Date());
-
-            single_day_forecast.setCurrentTemp((int) Math.round(mainObj.getDouble("temp")));
-            single_day_forecast.addMinTemp((int) Math.round(minTemp));
-            single_day_forecast.addMaxTemp((int) Math.round(maxTemp));
-            single_day_forecast.addHumidity((int) Math.round(mainObj.getDouble("humidity")));
-            single_day_forecast.addWindSpeed((int) windObj.getDouble("speed"));
-            single_day_forecast.addWeatherIconPath(getWeatherIconDrawablePath(activity_main, weatherID));
-            single_day_forecast.addWeatherDescription(main_weather_description);
-            single_day_forecast.setDate(date);
-
-            single_day_forecast.addSunrise(formatTimeStamp(sysObj.getLong("sunrise")*1000));
-            single_day_forecast.addSunset(formatTimeStamp(sysObj.getLong("sunset")*1000));
-
-
-            single_day_forecast.calculateWeatherIcon();
-            single_day_forecast.calculateAverageHumidity();
-            single_day_forecast.calculateAverageWind();
-
-        } catch (JSONException e1) {
-            e1.printStackTrace();
         }
-        // Updates adapter via Activity -> Fragment communication
-        // Utilizes an interface
-
-        // Hides the process dialog, letting the user know that the background operation is over
-        activity_main.hidePDialog();
-    }
 
 
 
@@ -670,9 +728,8 @@ public class JSONParser {
 
     }
 
-    /*
-    Formats the timestamp from UNIX UTC Timestamp to ---> "EEE MM-dd HH:mm:ss Z yyyy"
-     */
+
+    // Formats the timestamp from UNIX UTC Timestamp to ---> "EEE MM-dd HH:mm:ss Z yyyy"
     private CharSequence formatTimeStamp(long timeStamp){
         Calendar cal = Calendar.getInstance();
         TimeZone tz = cal.getTimeZone();
@@ -713,5 +770,10 @@ public class JSONParser {
     public Model_Forecast getSingle_day_forecast() {
         return single_day_forecast;
     }
+
+    public ArrayList<Model_Forecast> getForecast() {
+        return forecast;
+    }
+
 
 }

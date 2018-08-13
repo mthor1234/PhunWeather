@@ -21,12 +21,15 @@ import async.crash.com.phunweather.R;
  * Adapter holds indexes of unfolded elements for correct work with default reusable views behavior
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
+public class Adapter_ListView_Detail extends ArrayAdapter<Model_Forecast> {
 
     private HashSet<Integer> unfoldedIndexes = new HashSet<>();
     private View.OnClickListener defaultRequestBtnClickListener;
 
-    public Adapter_Unfolding(Context context, List<Model_Forecast> objects, Fragment_Detail.OnFragmentInteractionListener listener) {
+    // Imperial by default
+    private boolean unitType = true;
+
+    public Adapter_ListView_Detail(Context context, List<Model_Forecast> objects, Fragment_Detail.OnFragmentInteractionListener listener) {
         super(context, 0, objects);
     }
 
@@ -91,24 +94,53 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
         if (null == item)
             return cell;
 
+        if(unitType) {
 
-        // Folded Views
-        viewHolder.tv_date.setText(item.getDate());
-        viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp()) + "F");
-        viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp()) + "F");
-        viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp()) + "F");
-        viewHolder.iv_weatherIcon.setImageResource(item.getDrawableID());
+            // Imperial
+
+            // Folded Views
+            viewHolder.tv_date.setText(item.getDate());
+            viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp()) + "°F");
+            viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp()) + "°F");
+            viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp()) + "°F");
+            viewHolder.iv_weatherIcon.setImageResource(item.getDrawableID());
 
 
+            // Imperial
 
-        // Unfolded Views
-        viewHolder.tv_date_unfolded.setText(item.getDate());
-        viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp()) + "F");
-        viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp()) + "F");
-        viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp()) + "F");
-        viewHolder.tv_windSpeed.setText(Integer.toString(item.getWindSpeed()) + "MPH" );
-        viewHolder.tv_humidity.setText(Integer.toString(item.getHumidity()) + "%" );
-        viewHolder.iv_weatherIcon_unfolded.setImageResource(item.getDrawableID());
+            // Unfolded Views
+            viewHolder.tv_date_unfolded.setText(item.getDate());
+            viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp()) + "°F");
+            viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp()) + "°F");
+            viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp()) + "°F");
+            viewHolder.tv_windSpeed.setText(Integer.toString(item.getWindSpeed()) + "MPH");
+            viewHolder.tv_humidity.setText(Integer.toString(item.getHumidity()) + "%");
+            viewHolder.iv_weatherIcon_unfolded.setImageResource(item.getDrawableID());
+
+        }
+        else {
+            // Metric
+
+            // Folded Views
+            viewHolder.tv_date.setText(item.getDate());
+            viewHolder.tv_maxTemp.setText(Integer.toString(item.getMaxTemp_Metric()) + "°C");
+            viewHolder.tv_minTemp.setText(Integer.toString(item.getMinTemp_Metric()) + "°C");
+            viewHolder.tv_currentTemp.setText(Integer.toString(item.getCurrentTemp_Metric()) + "°C");
+            viewHolder.iv_weatherIcon.setImageResource(item.getDrawableID());
+
+
+            // Metric
+
+            // Unfolded Views
+            viewHolder.tv_date_unfolded.setText(item.getDate());
+            viewHolder.tv_maxTemp_unfolded.setText(Integer.toString(item.getMaxTemp_Metric()) + "°C");
+            viewHolder.tv_minTemp_unfolded.setText(Integer.toString(item.getMinTemp_Metric()) + "°C");
+            viewHolder.tv_currentTemp_unfolded.setText(Integer.toString(item.getCurrentTemp_Metric()) + "°C");
+            viewHolder.tv_windSpeed.setText(Integer.toString(item.getWindSpeed_Metric()) + "KPH");
+            viewHolder.tv_humidity.setText(Integer.toString(item.getHumidity()) + "%");
+            viewHolder.iv_weatherIcon_unfolded.setImageResource(item.getDrawableID());
+
+        }
 
         // set custom btn handler for list item from that item
         if (item.getRequestBtnClickListener() != null) {
@@ -122,24 +154,26 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
             viewHolder.tv_weatherDescription.setText(item.getWeather_Descriptions().get(0));
             viewHolder.tv_weatherDescription_unfolded.setText(item.getWeather_Descriptions().get(0));
         }else{
-            viewHolder.tv_weatherDescription.setText("Dummy Content");
-            viewHolder.tv_weatherDescription_unfolded.setText("Dummy Content");
+            viewHolder.tv_weatherDescription.setText(R.string.dummy_content);
+            viewHolder.tv_weatherDescription_unfolded.setText(R.string.dummy_content);
 
         }
 
         // Getting sunrises and sunsets
         if(item.getSunrises().size() > 0) {
-            viewHolder.tv_sunRise.setText( item.getSunrises().get(position));
+//            viewHolder.tv_sunRise.setText( item.getSunrises().get(position));
+            viewHolder.tv_sunRise.setText( item.getSunrises().get(0));
         }
         else{
-            viewHolder.tv_sunRise.setText("12345");
+            viewHolder.tv_sunRise.setText(R.string.dummy_content);
         }
 
         if(item.getSunsets().size() > 0) {
-            viewHolder.tv_sunSet.setText( item.getSunsets().get(position));
+//            viewHolder.tv_sunSet.setText( item.getSunsets().get(position));
+            viewHolder.tv_sunSet.setText( item.getSunsets().get(0));
         }
         else{
-            viewHolder.tv_sunSet.setText("12345");
+            viewHolder.tv_sunSet.setText(R.string.dummy_content);
         }
 
 
@@ -191,6 +225,15 @@ public class Adapter_Unfolding extends ArrayAdapter<Model_Forecast> {
         ImageView iv_weatherIcon_unfolded;
 
 
+    }
+
+    public void changeText(boolean unitType){
+
+    }
+
+    public void setUnitType(boolean unitType) {
+        this.unitType = unitType;
+        this.notifyDataSetChanged();
     }
 }
 
