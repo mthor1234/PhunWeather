@@ -61,7 +61,6 @@ public class Adapter_RecyclerView_Zipcode extends RecyclerView.Adapter<Adapter_R
         holder.mView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-//                Snackbar.make(v, "Item Clicked for a LOOOONNNG Time!", Snackbar.LENGTH_INDEFINITE);
                 System.out.println("Long Click");
                 return true;
             }

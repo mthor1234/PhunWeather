@@ -11,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -22,7 +24,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import async.crash.com.phunweather.Adapters.Adapter_Unfolding;
-import async.crash.com.phunweather.Interfaces.Interface_Communicate_With_Adapter;
+import async.crash.com.phunweather.Interfaces.Interface_Communicate_UnitType;
+import async.crash.com.phunweather.Interfaces.Interface_OnDataLoadListener;
 import async.crash.com.phunweather.Models.Model_Forecast;
 import async.crash.com.phunweather.R;
 
@@ -35,7 +38,7 @@ import static android.content.Context.MODE_PRIVATE;
  * interface.
  */
 public class Fragment_Detail extends Fragment
-implements Interface_Communicate_With_Adapter {
+implements Interface_Communicate_UnitType, Interface_OnDataLoadListener{
 
     private static final String TAG = Fragment_Detail.class.getSimpleName();
 
@@ -56,12 +59,14 @@ implements Interface_Communicate_With_Adapter {
     private String mParam1;
     private String mParam2;
 
+    private boolean unitType = true;
+
 //    private RecyclerView.Adapter adapter;
     private Adapter_Unfolding adapter;
 
     private ListView listView;
 
-    private static ArrayList<Model_Forecast> weather_forecast;
+    private ArrayList<Model_Forecast> weather_forecast = new ArrayList<Model_Forecast>();
 
 
     /**
@@ -81,11 +86,28 @@ implements Interface_Communicate_With_Adapter {
 //        return fragment;
 //    }
 
-    public static Fragment_Detail newInstance(ArrayList<Model_Forecast> forecast) {
+//    public static Fragment_Detail newInstance(ArrayList<Model_Forecast> forecast) {
+//        Fragment_Detail fragment = new Fragment_Detail();
+//        Bundle args = new Bundle();
+//
+//        weather_forecast = forecast;
+//
+////        for(Model_Forecast item: weather_forecast){
+////            item.print();
+////        }
+//
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
+    public static Fragment_Detail newInstance() {
         Fragment_Detail fragment = new Fragment_Detail();
         Bundle args = new Bundle();
 
-        weather_forecast = forecast;
+//        for(Model_Forecast item: weather_forecast){
+//            item.print();
+//        }
+
 
         fragment.setArguments(args);
         return fragment;
@@ -97,7 +119,6 @@ implements Interface_Communicate_With_Adapter {
 
         System.out.println("Fragment_Detail OnCreate!");
 
-        Toolbar toolbar= (Toolbar) getActivity().findViewById(R.id.tool_bar);
     }
 
 
@@ -107,16 +128,40 @@ implements Interface_Communicate_With_Adapter {
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
 
+        Toolbar toolbar= (Toolbar) getActivity().findViewById(R.id.tool_bar);
+
+
+
+        // Switch CODE
+
+        Switch switch_units = (Switch) toolbar.findViewById(R.id.switch_units);
+
+
         System.out.println("OnCreateView");
 
-        if(weather_forecast.size() > 0) {
-            weather_forecast.get(0).setRequestBtnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getActivity().getApplicationContext(), "CUSTOM HANDLER FOR FIRST BUTTON", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+        // TODO: COMMENTED OUT BECAUSE GETTING A NULL ENTRY WHEN CREATING THE FRAGMENT
+
+//        if(weather_forecast.size() > 0) {
+//            weather_forecast.get(0).setRequestBtnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Toast.makeText(getActivity().getApplicationContext(), "CUSTOM HANDLER FOR FIRST BUTTON", Toast.LENGTH_SHORT).show();
+//                }
+//            });
+//        }
+
+
+        // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
+
+        adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
+
+        // add default btn handler for each request btn on each item if custom handler not found
+        adapter.setDefaultRequestBtnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity().getApplicationContext(), "DEFAULT HANDLER FOR ALL BUTTONS", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Set the adapter
         if (view instanceof ListView) {
@@ -124,17 +169,6 @@ implements Interface_Communicate_With_Adapter {
             System.out.println("Setting the Adapter!!!!");
             Context context = view.getContext();
             listView = (ListView) view;
-
-            // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
-            adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
-
-            // add default btn handler for each request btn on each item if custom handler not found
-            adapter.setDefaultRequestBtnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(getActivity().getApplicationContext(), "DEFAULT HANDLER FOR ALL BUTTONS", Toast.LENGTH_SHORT).show();
-                }
-            });
 
             listView.setAdapter(adapter);
 
@@ -151,6 +185,22 @@ implements Interface_Communicate_With_Adapter {
 
         }
 
+        switch_units.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    System.out.println("FRAGMENT_DETAIL: Switch is checked!");
+                    unitType = true;
+                    adapter.setUnitType(unitType);
+                }else{
+                    System.out.println("FRAGMENT_DETAIL: Switch is not checked!");
+                    unitType = false;
+                    adapter.setUnitType(unitType);
+                }
+//                adapter.notifyDataSetChanged();
+            }
+        });
+
         return view;
     }
 
@@ -160,13 +210,6 @@ implements Interface_Communicate_With_Adapter {
 
         System.out.println("Fragment_Detail: OnActivityCreated!");
 
-        for(Model_Forecast item: weather_forecast){
-            System.out.println("FRAGMENT_DETAIL: " + item.getDate());
-        }
-
-//        if(weather_forecast == null) {
-//            loadData();
-//        }
 
         if(savedInstanceState != null) {
 //            loadData();
@@ -190,11 +233,14 @@ implements Interface_Communicate_With_Adapter {
         mListener = null;
     }
 
+
     @Override
-    public void updateAdapter() {
-        if(adapter != null) {
-            adapter.notifyDataSetChanged();
-        }
+    public void changeUnitType(boolean unitType) {
+        System.out.println("FRAGMENT_DETAIL: changingUnit Type " + unitType);
+
+        //TODO:  ADAPTER HASN'T BEEN CREATED YET? java.lang.NullPointerException: Attempt to invoke virtual method 'void async.crash.com.phunweather.Adapters.Adapter_Unfolding.setUnitType(boolean)' on a null object reference
+        adapter.setUnitType(unitType);
+        adapter.notifyDataSetChanged();
     }
 
 
@@ -202,10 +248,9 @@ implements Interface_Communicate_With_Adapter {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
-//        saveData();
+        saveData();
     }
     // Overrides from Interface_Communicate_With_Adapater
-
 
     // Save data to shared preferences
     //  1) GrabShared Preferences Obj
@@ -251,6 +296,30 @@ implements Interface_Communicate_With_Adapter {
 
     }
 
+    @Override
+    public void onDataLoaded(Context context,ArrayList<Model_Forecast> forecast) {
+        System.out.println("onDataLoaded: ");
+        if(forecast != null) {
+
+
+
+            // create custom adapter that holds elements and their state (we need hold a id's of unfolded elements for reusable elements)
+
+
+            weather_forecast = forecast;
+//            adapter = new Adapter_Unfolding(getActivity(), weather_forecast, mListener);
+
+
+//            for(Model_Forecast item: weather_forecast){
+//            item.print();
+//        }
+
+
+
+//            adapter.notifyDataSetChanged();
+//            listView.setAdapter(adapter);
+        }
+    }
 
 
     /**
