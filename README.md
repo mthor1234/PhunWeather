@@ -3,10 +3,6 @@
 PhunWeather is a weather forecast Android application. It provdes an up-to-date, six day weather forecast.
 The user can store a list of different zip codes and fetch weather forecast information for each zip code.
 
-![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
-
-
-
 
 Phunware Project Description
 
@@ -37,7 +33,7 @@ Build on a device of min SDK 16
 * [Gradle](https://gradle.org/) - Dependency Management
 * [Volley](https://developer.android.com/training/volley/) - Volley is an HTTP library that makes networking for Android apps easier and     most importantly, faster. 
 * [Folding Cell](https://github.com/Ramotion/folding-cell-android) - Android folding library by Ramotion Inc.
-* [Open Weather Map](https://openweathermap.org/ - Free weather information API
+* [Open Weather Map](https://openweathermap.org/) - Free weather information API
 
 ## Authors
 
