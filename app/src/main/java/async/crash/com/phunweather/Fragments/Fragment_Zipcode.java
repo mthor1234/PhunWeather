@@ -214,7 +214,7 @@ public class Fragment_Zipcode extends Fragment
 
                 // remove the item from recycler view
                 adapter.removeItem(viewHolder.getAdapterPosition());
-                al_zipCodes.remove(position);
+                al_zipCodes.remove(position - 1);
                 updateAdapter();
 
 
