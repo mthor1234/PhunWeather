@@ -10,6 +10,10 @@ Create a list-based application that allows the user to fetch weather informatio
 
 ![PhunWeather in Action](https://media.giphy.com/media/2tKzor05KExknDhrr0/giphy.gif)
 
+![Alt Text](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+
+
+
 
 
 ## Getting Started
