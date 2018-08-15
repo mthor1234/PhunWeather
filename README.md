@@ -7,16 +7,7 @@ Phunware Project Description
 
 Create a list-based application that allows the user to fetch weather information from a weather services API of your choice. The user should be able to add/remove zip codes from the list. Please focus effort on the weather services API interface. The application UI should be functional – it doesn't have to be pretty.
 
-
-![](https://github.com/mthor1234/PhunWeather/blob/master/PhunWeather.gif)
-<img src="https://github.com/mthor1234/PhunWeather/blob/master/PhunWeather.gif" width="200" height="650">
-
-
-
-
-
-
-
+<img src="https://github.com/mthor1234/PhunWeather/blob/master/PhunWeather.gif" width="253.13" height="450">
 
 
 
