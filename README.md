@@ -3,10 +3,14 @@
 PhunWeather is a weather forecast Android application. It provdes an up-to-date, six day weather forecast.
 The user can store a list of different zip codes and fetch weather forecast information for each zip code.
 
-
 Phunware Project Description
 
 Create a list-based application that allows the user to fetch weather information from a weather services API of your choice. The user should be able to add/remove zip codes from the list. Please focus effort on the weather services API interface. The application UI should be functional – it doesn't have to be pretty.
+
+
+![PhunWeather in Action](https://media.giphy.com/media/2tKzor05KExknDhrr0/giphy.gif)
+
+
 
 ## Getting Started
 
