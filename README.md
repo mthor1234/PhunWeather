@@ -9,6 +9,11 @@ Create a list-based application that allows the user to fetch weather informatio
 
 
 ![](https://github.com/mthor1234/PhunWeather/blob/master/PhunWeather.gif)
+<img src="https://github.com/mthor1234/PhunWeather/blob/master/PhunWeather.gif" width="200" height="650">
+
+
+
+
 
 
 
